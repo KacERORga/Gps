@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCPGPS — Карта | Навигатор</title>
+    <title>NCPGPS — Навигатор принятых решений</title>
     <!-- MapLibre GL CSS + JS -->
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
@@ -11,16 +11,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #0a0f1a; height: 100vh; overflow: hidden; position: relative; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         
-        /* КАРТА — ВО ВСЮ СТРАНИЦУ */
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            background: #1a2a3a; /* временный фон, пока плитки не загрузились */
-        }
+        #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #1a2a3a; }
         
         /* Боковые кнопки (слева снизу) */
         .side-buttons {
@@ -95,7 +86,6 @@
             margin-left: 8px;
         }
         
-        /* Подсказки поиска */
         .suggestions-list {
             position: absolute;
             top: 100%;
@@ -119,7 +109,7 @@
         .suggestion-main { font-weight: 500; }
         .suggestion-desc { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
         
-        /* Нижняя информационная панель */
+        /* Нижняя панель */
         .bottom-sheet {
             position: absolute;
             bottom: 20px;
@@ -166,16 +156,8 @@
             gap: 6px;
         }
         .quantum-chip { background: #4c1d95; border: 0.5px solid #a855f7; }
-        .status-led {
-            width: 8px;
-            height: 8px;
-            border-radius: 10px;
-            background: #4ade80;
-            box-shadow: 0 0 6px #4ade80;
-            display: inline-block;
-        }
+        .status-led { width: 8px; height: 8px; border-radius: 10px; background: #4ade80; box-shadow: 0 0 6px #4ade80; display: inline-block; }
         
-        /* Кнопка "О проекте" (маленькая) */
         .promo-link-btn {
             position: absolute;
             top: 20px;
@@ -195,14 +177,14 @@
             gap: 6px;
         }
         
-        /* Промо-модальное окно */
-        .promo-modal {
+        /* Модальные окна (промо и политика) */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.92);
             backdrop-filter: blur(12px);
             z-index: 1000;
             display: flex;
@@ -212,32 +194,66 @@
             opacity: 0;
             transition: 0.2s;
         }
-        .promo-modal.active { visibility: visible; opacity: 1; }
-        .promo-content {
-            background: #0a0c12;
-            max-width: 460px;
-            width: 90%;
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-content {
+            background: #0f1219;
+            max-width: 520px;
+            width: 92%;
             max-height: 85vh;
             border-radius: 32px;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 20px;
+            border: 1px solid #2d3e5a;
+            padding: 24px 20px;
             position: relative;
             overflow-y: auto;
-            color: #eee;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
-        .promo-close {
+        .modal-close {
             position: absolute;
-            top: 12px;
-            right: 18px;
+            top: 16px;
+            right: 20px;
             font-size: 28px;
             cursor: pointer;
             color: #aaa;
+            transition: 0.1s;
         }
-        .promo-title { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg,#60a5fa,#a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 16px; }
-        .promo-text { color: #ccc; line-height: 1.4; margin-bottom: 20px; }
-        .promo-feature { display: flex; gap: 12px; margin-bottom: 18px; padding: 8px 0; border-bottom: 1px solid #2d3748; }
-        .promo-feature-icon { font-size: 1.8rem; }
+        .modal-close:hover { color: white; }
+        .modal-title { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg,#60a5fa,#a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px; }
+        .modal-section { margin-bottom: 24px; border-bottom: 1px solid #1e2a3a; padding-bottom: 16px; }
+        .modal-section h4 { color: #60a5fa; margin-bottom: 10px; font-size: 1.1rem; }
+        .modal-section p, .modal-section li { color: #cbd5e1; margin-bottom: 8px; }
+        .modal-section ul { padding-left: 20px; }
         
+        .cookie-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 16px;
+            right: 16px;
+            background: #1a2a3aee;
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 14px 18px;
+            z-index: 300;
+            border-left: 4px solid #60a5fa;
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 8px 24px black;
+        }
+        .cookie-toast button {
+            background: #2c6e9e;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
         .toast {
             position: absolute;
             bottom: 100px;
@@ -256,6 +272,7 @@
         @media (max-width: 600px) {
             .icon-btn { padding: 5px 10px; min-width: 100px; font-size: 0.7rem; }
             .top-bar { right: 100px; }
+            .modal-content { padding: 20px 16px; }
         }
     </style>
 </head>
@@ -263,17 +280,14 @@
 
 <div id="map"></div>
 
-<!-- Кнопка "О проекте" -->
 <button class="promo-link-btn" id="promoLinkBtn">✨ О проекте</button>
 
-<!-- Боковые кнопки (слева снизу) -->
 <div class="side-buttons">
     <div class="icon-btn" id="centerBtn"><span>📍</span><span>Моё место</span></div>
     <div class="icon-btn" id="quantumCompactBtn"><span>🌀</span><span>Квантовый режим</span></div>
     <div class="icon-btn" id="archiveCompact"><span>📋</span><span>Архив</span></div>
 </div>
 
-<!-- Поиск -->
 <div class="top-bar">
     <div class="search-container">
         <div class="search-input-wrapper">
@@ -285,7 +299,6 @@
     </div>
 </div>
 
-<!-- Нижняя панель -->
 <div class="bottom-sheet">
     <div class="route-stats" id="routeStatsBox" style="display: none;">
         <span>🛣️ <span id="routeDistance">0 км</span></span>
@@ -298,50 +311,68 @@
     <div id="coordStatus" style="font-size:0.65rem;">📍 Определение...</div>
 </div>
 
-<!-- Промо-модалка -->
-<div id="promoModal" class="promo-modal">
-    <div class="promo-content">
-        <div class="promo-close" id="promoCloseBtn">&times;</div>
-        <div class="promo-title">🧭 NCPGPS</div>
-        <div class="promo-text">Независимый навигатор принятых решений. Маршруты принимаются здесь. Где здесь — неизвестно.</div>
-        <div class="promo-feature"><div class="promo-feature-icon">⚖️</div><div><strong>Независимость</strong><br>Мы никому не подчиняемся. Даже себе.</div></div>
-        <div class="promo-feature"><div class="promo-feature-icon">🌀</div><div><strong>Квантовые маршруты</strong><br>Маршрут существует во всех состояниях, пока вы не начнёте движение.</div></div>
-        <div class="promo-feature"><div class="promo-feature-icon">🔒</div><div><strong>Конфиденциальность</strong><br>Мы не знаем, кто вы. И вы не знаете, кто мы.</div></div>
-        <div class="promo-text" style="margin-top:16px;">«Если вы нашли ошибку — значит вы ошибаетесь. Решение уже принято.»</div>
+<!-- Модалка "О проекте" -->
+<div id="promoModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-close" id="promoCloseBtn">&times;</div>
+        <div class="modal-title">🧭 NCPGPS</div>
+        <div class="modal-section"><h4>📜 О проекте</h4><p>Независимый навигатор принятых решений. Маршруты принимаются здесь. Где здесь — неизвестно. Квантовая суперпозиция маршрутов, полная конфиденциальность и отсутствие ответственности за пробки.</p></div>
+        <div class="modal-section"><h4>⚖️ Почему NCPGPS?</h4><p><strong>Независимость</strong> — мы никому не подчиняемся.<br><strong>Квантовые маршруты</strong> — маршрут существует во всех состояниях, пока вы не начнёте движение.<br><strong>Конфиденциальность</strong> — мы не знаем, кто вы. И вы не знаете, кто мы.</p></div>
+        <div class="modal-section"><h4>🔒 Политика конфиденциальности</h4><p><a href="#" id="openPolicyBtn" style="color:#60a5fa;">📄 Полная версия →</a></p></div>
     </div>
 </div>
 
+<!-- Модалка ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ + ИСПОЛЬЗОВАНИЕ ДАННЫХ (полная версия) -->
+<div id="policyModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-close" id="policyCloseBtn">&times;</div>
+        <div class="modal-title">🔒 Политика конфиденциальности и использования данных</div>
+        
+        <div class="modal-section"><h4>1. Какие данные собираются</h4><p>NCPGPS может запрашивать доступ к геолокации для построения маршрутов. Эти данные <strong>не покидают ваш браузер</strong> и не передаются третьим лицам. История маршрутов сохраняется <strong>локально в localStorage</strong> — только на вашем устройстве.</p></div>
+        
+        <div class="modal-section"><h4>2. Использование сторонних сервисов</h4><p>Навигатор использует открытые API:<br>
+        - <strong>OpenStreetMap (OSM)</strong> — картографические данные (только загрузка тайлов)<br>
+        - <strong>OSRM</strong> — построение маршрутов<br>
+        - <strong>Nominatim</strong> — поиск адресов<br>
+        - <strong>ip-api.com</strong> — определение города по IP (если GPS недоступен)<br>
+        Эти сервисы могут собирать обезличенную информацию в соответствии с их собственными политиками.</p></div>
+        
+        <div class="modal-section"><h4>3. Хранение данных</h4><p>Ваши маршруты, настройки и архив хранятся только в браузере (localStorage). Мы не имеем к ним доступа. Вы можете очистить историю в любой момент через инструменты браузера.</p></div>
+        
+        <div class="modal-section"><h4>4. Файлы cookie и отслеживание</h4><p>Сайт <strong>не использует аналитические cookie</strong>, не отслеживает пользователей и не передаёт данные рекламным сетям. Единственное локальное хранилище — для архива маршрутов.</p></div>
+        
+        <div class="modal-section"><h4>5. Ваши права</h4><p>Вы можете отказаться от использования геолокации в настройках браузера — навигатор продолжит работать с ручным вводом адресов. Вы можете очистить localStorage через консоль браузера или настройки сайта.</p></div>
+        
+        <div class="modal-section"><h4>6. Изменения политики</h4><p>NCPGPS — контент-проект. Политика может меняться, изменения публикуются здесь. Текущая версия от 2026 года.</p></div>
+        
+        <div class="modal-section"><h4>7. Контакты</h4><p>Если у вас есть вопросы: <strong>support@npcgps.space</strong> (решение о прочтении письма может быть не принято).</p></div>
+        
+        <div style="text-align:center; margin-top:12px;"><span class="quantum-chip" style="background:#2c6e9e; cursor:default;">⚡ Решение о конфиденциальности принято</span></div>
+    </div>
+</div>
+
+<!-- ВСПЛЫВАШКА (COOKIE / GDPR) ПРИ ПЕРВОМ ОТКРЫТИИ -->
+<div id="cookieToast" class="cookie-toast" style="display: none;">
+    <span>🍪 NCPGPS использует локальное хранилище для архива маршрутов. Геолокация запрашивается только с вашего разрешения. Мы не передаём ваши данные третьим лицам.</span>
+    <button id="acceptCookieBtn">Принять</button>
+</div>
+
 <script>
-    // ЖДЁМ ПОЛНОЙ ЗАГРУЗКИ СТРАНИЦЫ, ПОТОМ СОЗДАЁМ КАРТУ
     window.addEventListener('load', function() {
-        // 1. КАРТА (MapLibre) — точно появится
+        // --- КАРТА (MapLibre) ---
         var map = new maplibregl.Map({
             container: 'map',
             style: {
                 version: 8,
-                sources: {
-                    'osm': {
-                        type: 'raster',
-                        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                        tileSize: 256,
-                        attribution: '© OpenStreetMap'
-                    }
-                },
-                layers: [{
-                    id: 'osm-layer',
-                    type: 'raster',
-                    source: 'osm',
-                    minzoom: 0,
-                    maxzoom: 19
-                }]
+                sources: { 'osm': { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' } },
+                layers: [{ id: 'osm-layer', type: 'raster', source: 'osm', minzoom: 0, maxzoom: 19 }]
             },
             center: [37.618423, 55.751244],
             zoom: 12
         });
-        
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
         
-        // 2. ПЕРЕМЕННЫЕ
+        // Переменные
         var userMarker = new maplibregl.Marker({ color: '#3b82f6' }).setLngLat([37.618423, 55.751244]).addTo(map);
         var destMarkers = [];
         var routeSources = [];
@@ -350,14 +381,28 @@
         var continueBtn = null;
         var lastTap = 0;
         
-        // Загружаем архив
+        // Загрузка истории из localStorage
         try {
             var stored = localStorage.getItem('ncp_gps_history');
             if (stored) routeHistory = JSON.parse(stored);
             document.getElementById('archiveCount').innerText = routeHistory.length;
         } catch(e) {}
         
-        // 3. ГЕОЛОКАЦИЯ
+        // --- COOKIE / ПЕРВИЧНОЕ СОГЛАСИЕ ---
+        function showCookieConsent() {
+            var consented = localStorage.getItem('ncp_consent');
+            if (consented !== 'yes') {
+                var toastDiv = document.getElementById('cookieToast');
+                toastDiv.style.display = 'flex';
+                document.getElementById('acceptCookieBtn').onclick = function() {
+                    localStorage.setItem('ncp_consent', 'yes');
+                    toastDiv.style.display = 'none';
+                };
+            }
+        }
+        showCookieConsent();
+        
+        // --- ГЕОЛОКАЦИЯ ---
         function startGPS() {
             var statusDiv = document.getElementById('coordStatus');
             if (!navigator.geolocation) {
@@ -388,21 +433,15 @@
             );
         }
         
-        // 4. ПОСТРОЕНИЕ МАРШРУТА
+        // --- МАРШРУТЫ ---
         async function buildRouteTo(startLat, startLng, endLat, endLng) {
             if (startLat === null || endLat === null) return;
-            // очистка
             destMarkers.forEach(m => m.remove());
             destMarkers = [];
-            routeSources.forEach(src => {
-                if (map.getLayer(src)) map.removeLayer(src);
-                if (map.getSource(src)) map.removeSource(src);
-            });
+            routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); });
             routeSources = [];
-            
             var destMarker = new maplibregl.Marker({ color: '#ef4444' }).setLngLat([endLng, endLat]).addTo(map);
             destMarkers.push(destMarker);
-            
             var url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
             try {
                 var resp = await fetch(url);
@@ -413,28 +452,22 @@
                     map.addSource(srcId, { type: 'geojson', data: { type: 'Feature', geometry: route.geometry } });
                     map.addLayer({ id: srcId, type: 'line', source: srcId, paint: { 'line-color': '#3b82f6', 'line-width': 5 } });
                     routeSources.push(srcId);
-                    
                     var bounds = new maplibregl.LngLatBounds();
                     route.geometry.coordinates.forEach(c => bounds.extend([c[0], c[1]]));
                     map.fitBounds(bounds, { padding: 50 });
-                    
                     var dist = (route.distance / 1000).toFixed(1);
                     var dur = Math.round(route.duration / 60);
                     document.getElementById('routeDistance').innerHTML = dist + ' км';
                     document.getElementById('routeDuration').innerHTML = dur + ' мин';
                     document.getElementById('routeStatsBox').style.display = 'flex';
-                    
                     routeHistory.unshift({ text: dist + 'км / ' + dur + 'мин', time: new Date().toLocaleTimeString() });
                     if (routeHistory.length > 12) routeHistory.pop();
                     localStorage.setItem('ncp_gps_history', JSON.stringify(routeHistory));
                     document.getElementById('archiveCount').innerText = routeHistory.length;
-                } else {
-                    alert('Маршрут не найден');
-                }
+                } else { alert('Маршрут не найден'); }
             } catch(e) { alert('Ошибка маршрута'); }
         }
         
-        // 5. ПОИСК АДРЕСА
         async function buildFromInput() {
             var dest = document.getElementById('destinationInput').value.trim();
             if (!dest) { alert('Введите адрес'); return; }
@@ -442,15 +475,11 @@
             try {
                 var resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1`);
                 var data = await resp.json();
-                if (data.length) {
-                    await buildRouteTo(currentLat, currentLng, parseFloat(data[0].lat), parseFloat(data[0].lon));
-                } else {
-                    alert('Адрес не найден');
-                }
+                if (data.length) await buildRouteTo(currentLat, currentLng, parseFloat(data[0].lat), parseFloat(data[0].lon));
+                else alert('Адрес не найден');
             } catch(e) { alert('Ошибка поиска'); }
         }
         
-        // 6. КВАНТОВЫЙ РЕЖИМ (альтернативы)
         async function quantumModeFunc() {
             var dest = document.getElementById('destinationInput').value.trim();
             if (!dest) { alert('Введите цель'); return; }
@@ -492,7 +521,7 @@
             document.getElementById('routeStatsBox').style.display = 'none';
         }
         
-        // 7. Обработчики UI
+        // --- UI обработчики ---
         document.getElementById('buildRouteCompact').onclick = buildFromInput;
         document.getElementById('quantumCompactBtn').onclick = quantumModeFunc;
         document.getElementById('quantumCompactBtn2').onclick = quantumModeFunc;
@@ -502,13 +531,18 @@
         document.getElementById('archiveCompact').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         document.getElementById('archiveCompact2').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         
-        // Промо-модальное окно
+        // Модалки
         var promoModal = document.getElementById('promoModal');
+        var policyModal = document.getElementById('policyModal');
         document.getElementById('promoLinkBtn').onclick = () => promoModal.classList.add('active');
         document.getElementById('promoCloseBtn').onclick = () => promoModal.classList.remove('active');
         promoModal.onclick = (e) => { if (e.target === promoModal) promoModal.classList.remove('active'); };
         
-        // Подсказки при вводе
+        document.getElementById('openPolicyBtn').onclick = (e) => { e.preventDefault(); promoModal.classList.remove('active'); policyModal.classList.add('active'); };
+        document.getElementById('policyCloseBtn').onclick = () => policyModal.classList.remove('active');
+        policyModal.onclick = (e) => { if (e.target === policyModal) policyModal.classList.remove('active'); };
+        
+        // Подсказки поиска
         var input = document.getElementById('destinationInput');
         var suggestTimeout;
         input.addEventListener('input', function() {
@@ -542,47 +576,28 @@
         });
         document.addEventListener('click', (e) => { if (!document.querySelector('.search-container')?.contains(e.target)) document.getElementById('suggestionsList').style.display = 'none'; });
         
-        // Долгое нажатие: кнопка "Продолжить маршрут до сюда"
+        // Долгое нажатие (продолжить маршрут)
         map.on('contextmenu', (e) => {
             e.preventDefault();
             if (continueBtn) continueBtn.remove();
             var btn = document.createElement('button');
             btn.innerText = '🚗 Продолжить маршрут до сюда';
-            btn.style.position = 'absolute';
-            btn.style.bottom = '120px';
-            btn.style.left = '50%';
-            btn.style.transform = 'translateX(-50%)';
-            btn.style.background = '#2c6e9e';
-            btn.style.padding = '12px 20px';
-            btn.style.borderRadius = '40px';
-            btn.style.border = 'none';
-            btn.style.color = 'white';
-            btn.style.fontWeight = 'bold';
-            btn.style.zIndex = '300';
-            btn.style.cursor = 'pointer';
-            btn.onclick = () => {
-                if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng);
-                btn.remove();
-            };
+            btn.style.cssText = 'position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:#2c6e9e; padding:12px 20px; border-radius:40px; border:none; color:white; font-weight:bold; z-index:300; cursor:pointer;';
+            btn.onclick = () => { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); btn.remove(); };
             document.body.appendChild(btn);
             setTimeout(() => btn.remove(), 8000);
             continueBtn = btn;
         });
         
-        // Двойной тап — быстрый маршрут
+        // Двойной тап
         map.on('click', (e) => {
             var now = Date.now();
-            if (now - lastTap < 300) {
-                if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng);
-            }
+            if (now - lastTap < 300) { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); }
             lastTap = now;
         });
         
-        // Запускаем GPS
         startGPS();
-        
-        // Сообщение в консоль, что карта создана
-        console.log('Карта NCPGPS загружена!');
+        console.log('NCPGPS: карта загружена, политика конфиденциальности добавлена');
     });
 </script>
 </body>
