@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCPGPS — Навигатор принятых решений</title>
+    <title>NCPGPS — Быстрый навигатор</title>
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
@@ -14,10 +14,9 @@
             overflow: hidden; 
             position: relative; 
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            transition: background 0.2s, color 0.2s;
         }
         
-        /* ========= ТЕМНАЯ ТЕМА ========= */
+        /* ========= ТЕМЫ ИНТЕРФЕЙСА ========= */
         body.dark-theme {
             background: #0a0f1a;
         }
@@ -33,13 +32,9 @@
         }
         body.dark-theme #destinationInput { color: #ffffff; }
         body.dark-theme .suggestions-list { background: #1e2a3a; }
-        body.dark-theme .suggestion-item { color: #e2e8f0; border-color: rgba(255,255,255,0.05); }
+        body.dark-theme .suggestion-item { color: #e2e8f0; }
         body.dark-theme .footer-credit { color: #64748b; }
-        body.dark-theme .route-stats { background: rgba(0,0,0,0.5); color: #e2e8f0; }
-        body.dark-theme .voice-badge,
-        body.dark-theme .archive-chip { background: rgba(0,0,0,0.5); color: #e2e8f0; }
         
-        /* ========= СВЕТЛАЯ ТЕМА ========= */
         body.light-theme {
             background: #f1f5f9;
         }
@@ -55,99 +50,36 @@
         }
         body.light-theme #destinationInput { color: #0f172a; }
         body.light-theme .suggestions-list { background: #ffffff; }
-        body.light-theme .suggestion-item { color: #1e293b; border-color: #e2e8f0; }
+        body.light-theme .suggestion-item { color: #1e293b; }
         body.light-theme .footer-credit { color: #475569; }
-        body.light-theme .route-stats { background: #e2e8f0; color: #0f172a; }
-        body.light-theme .voice-badge,
-        body.light-theme .archive-chip { background: #e2e8f0; color: #0f172a; }
         
-        /* ========= СИНЯЯ ТЕМА ========= */
-        body.blue-theme {
-            background: #0c2d4a;
-        }
-        body.blue-theme .icon-btn,
-        body.blue-theme .search-container,
-        body.blue-theme .bottom-sheet,
-        body.blue-theme .menu-btn,
-        body.blue-theme .menu-panel,
-        body.blue-theme .settings-panel {
-            background: rgba(12, 45, 74, 0.95);
-            color: #bae6fd;
-            border-color: #1e88e5;
+        body.blue-theme { background: #0c2d4a; }
+        body.blue-theme .icon-btn, body.blue-theme .search-container, body.blue-theme .bottom-sheet,
+        body.blue-theme .menu-btn, body.blue-theme .menu-panel, body.blue-theme .settings-panel {
+            background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5;
         }
         body.blue-theme #destinationInput { color: #f0f9ff; }
-        body.blue-theme .suggestions-list { background: #0c2d4a; }
-        body.blue-theme .suggestion-item { color: #bae6fd; border-color: #1e88e5; }
-        body.blue-theme .footer-credit { color: #7dd3fc; }
-        body.blue-theme .route-stats { background: rgba(0,0,0,0.3); color: #bae6fd; }
-        body.blue-theme .voice-badge,
-        body.blue-theme .archive-chip { background: rgba(0,0,0,0.3); color: #bae6fd; }
         
-        /* ========= ЗЕЛЁНАЯ ТЕМА ========= */
-        body.green-theme {
-            background: #0a2e1a;
-        }
-        body.green-theme .icon-btn,
-        body.green-theme .search-container,
-        body.green-theme .bottom-sheet,
-        body.green-theme .menu-btn,
-        body.green-theme .menu-panel,
-        body.green-theme .settings-panel {
-            background: rgba(10, 46, 26, 0.95);
-            color: #bbf7d0;
-            border-color: #22c55e;
+        body.green-theme { background: #0a2e1a; }
+        body.green-theme .icon-btn, body.green-theme .search-container, body.green-theme .bottom-sheet,
+        body.green-theme .menu-btn, body.green-theme .menu-panel, body.green-theme .settings-panel {
+            background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e;
         }
         body.green-theme #destinationInput { color: #f0fdf4; }
-        body.green-theme .suggestions-list { background: #0a2e1a; }
-        body.green-theme .suggestion-item { color: #bbf7d0; border-color: #22c55e; }
-        body.green-theme .footer-credit { color: #86efac; }
-        body.green-theme .route-stats { background: rgba(0,0,0,0.3); color: #bbf7d0; }
-        body.green-theme .voice-badge,
-        body.green-theme .archive-chip { background: rgba(0,0,0,0.3); color: #bbf7d0; }
         
-        /* ========= КРАСНАЯ ТЕМА ========= */
-        body.red-theme {
-            background: #3b0a0a;
-        }
-        body.red-theme .icon-btn,
-        body.red-theme .search-container,
-        body.red-theme .bottom-sheet,
-        body.red-theme .menu-btn,
-        body.red-theme .menu-panel,
-        body.red-theme .settings-panel {
-            background: rgba(59, 10, 10, 0.95);
-            color: #fecaca;
-            border-color: #ef4444;
+        body.red-theme { background: #3b0a0a; }
+        body.red-theme .icon-btn, body.red-theme .search-container, body.red-theme .bottom-sheet,
+        body.red-theme .menu-btn, body.red-theme .menu-panel, body.red-theme .settings-panel {
+            background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444;
         }
         body.red-theme #destinationInput { color: #fef2f2; }
-        body.red-theme .suggestions-list { background: #3b0a0a; }
-        body.red-theme .suggestion-item { color: #fecaca; border-color: #ef4444; }
-        body.red-theme .footer-credit { color: #fca5a5; }
-        body.red-theme .route-stats { background: rgba(0,0,0,0.3); color: #fecaca; }
-        body.red-theme .voice-badge,
-        body.red-theme .archive-chip { background: rgba(0,0,0,0.3); color: #fecaca; }
         
-        /* ========= ФИОЛЕТОВАЯ ТЕМА ========= */
-        body.purple-theme {
-            background: #1a0a3b;
-        }
-        body.purple-theme .icon-btn,
-        body.purple-theme .search-container,
-        body.purple-theme .bottom-sheet,
-        body.purple-theme .menu-btn,
-        body.purple-theme .menu-panel,
-        body.purple-theme .settings-panel {
-            background: rgba(26, 10, 59, 0.95);
-            color: #e9d5ff;
-            border-color: #a855f7;
+        body.purple-theme { background: #1a0a3b; }
+        body.purple-theme .icon-btn, body.purple-theme .search-container, body.purple-theme .bottom-sheet,
+        body.purple-theme .menu-btn, body.purple-theme .menu-panel, body.purple-theme .settings-panel {
+            background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7;
         }
         body.purple-theme #destinationInput { color: #faf5ff; }
-        body.purple-theme .suggestions-list { background: #1a0a3b; }
-        body.purple-theme .suggestion-item { color: #e9d5ff; border-color: #a855f7; }
-        body.purple-theme .footer-credit { color: #d8b4fe; }
-        body.purple-theme .route-stats { background: rgba(0,0,0,0.3); color: #e9d5ff; }
-        body.purple-theme .voice-badge,
-        body.purple-theme .archive-chip { background: rgba(0,0,0,0.3); color: #e9d5ff; }
         
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #1a2a3a; }
         
@@ -247,7 +179,7 @@
             flex-direction: column;
             gap: 8px;
             border: 1px solid;
-            min-width: 160px;
+            min-width: 170px;
         }
         .menu-panel.active { display: flex; }
         .menu-panel button {
@@ -271,29 +203,29 @@
             bottom: 140px;
             left: 16px;
             right: auto;
-            width: 280px;
+            width: 260px;
             backdrop-filter: blur(20px);
             border-radius: 28px;
             padding: 20px;
             z-index: 35;
             display: none;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
             border: 1px solid;
         }
         .settings-panel.active { display: flex; }
-        .settings-title { font-weight: 600; margin-bottom: 12px; font-size: 0.9rem; text-align: center; }
-        .theme-options {
+        .settings-title { font-weight: 600; margin-bottom: 12px; font-size: 0.85rem; text-align: center; }
+        .themes-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
         .theme-btn {
             border: none;
-            padding: 10px 8px;
+            padding: 8px 6px;
             border-radius: 40px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             transition: 0.1s;
             text-align: center;
@@ -433,9 +365,7 @@
             max-height: 60vh;
             overflow-y: auto;
         }
-        .changelog-toast h3 { margin-bottom: 8px; color: #facc15; }
-        .changelog-toast ul { padding-left: 20px; margin: 8px 0; }
-        .changelog-toast li { margin: 4px 0; }
+        .changelog-toast h3 { color: #facc15; margin-bottom: 8px; }
         .changelog-toast button { background: #2c6e9e; border: none; padding: 6px 16px; border-radius: 40px; color: white; margin-top: 12px; cursor: pointer; }
         
         .cookie-toast {
@@ -462,10 +392,7 @@
         @media (max-width: 600px) {
             .icon-btn { padding: 5px 10px; min-width: 100px; font-size: 0.7rem; }
             .top-bar { left: 65px; }
-            .menu-panel { min-width: 140px; }
-            .settings-panel { width: 260px; }
-            .theme-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .theme-btn { padding: 8px 6px; font-size: 0.7rem; }
+            .settings-panel { width: 240px; }
         }
     </style>
 </head>
@@ -481,14 +408,16 @@
 </div>
 
 <div id="settingsPanel" class="settings-panel">
-    <div class="settings-title">🎨 Выбери тему интерфейса</div>
-    <div class="theme-options">
-        <button class="theme-btn" data-theme="dark">🌙 Тёмная</button>
-        <button class="theme-btn" data-theme="light">☀️ Светлая</button>
-        <button class="theme-btn" data-theme="blue">💙 Синяя</button>
-        <button class="theme-btn" data-theme="green">💚 Зелёная</button>
-        <button class="theme-btn" data-theme="red">❤️ Красная</button>
-        <button class="theme-btn" data-theme="purple">💜 Фиолетовая</button>
+    <div>
+        <div class="settings-title">🎨 Тема интерфейса</div>
+        <div class="themes-grid">
+            <button class="theme-btn" data-theme="dark">🌙 Тёмная</button>
+            <button class="theme-btn" data-theme="light">☀️ Светлая</button>
+            <button class="theme-btn" data-theme="blue">💙 Синяя</button>
+            <button class="theme-btn" data-theme="green">💚 Зелёная</button>
+            <button class="theme-btn" data-theme="red">❤️ Красная</button>
+            <button class="theme-btn" data-theme="purple">💜 Фиолетовая</button>
+        </div>
     </div>
 </div>
 
@@ -525,8 +454,7 @@
     <div class="modal-content">
         <div class="modal-close" id="promoCloseBtn">&times;</div>
         <div class="modal-title">🧭 NCPGPS</div>
-        <div class="modal-section"><h4>📜 О проекте</h4><p>Независимый навигатор принятых решений. Маршруты принимаются здесь. Где здесь — неизвестно.</p></div>
-        <div class="modal-section"><h4>⚖️ Почему NCPGPS?</h4><p><strong>Независимость</strong> — мы никому не подчиняемся.<br><strong>Конфиденциальность</strong> — мы не знаем, кто вы.</p></div>
+        <div class="modal-section"><h4>📜 О проекте</h4><p>Независимый навигатор принятых решений.</p></div>
         <div class="modal-section"><h4>🔒 Политика конфиденциальности</h4><p><a href="#" id="openPolicyBtn" style="color:#60a5fa;">📄 Полная версия →</a></p></div>
     </div>
 </div>
@@ -535,41 +463,52 @@
     <div class="modal-content">
         <div class="modal-close" id="policyCloseBtn">&times;</div>
         <div class="modal-title">🔒 Политика конфиденциальности</div>
-        <div class="modal-section"><h4>1. Данные</h4><p>Геолокация запрашивается только с вашего разрешения. Не передаётся никуда.</p></div>
-        <div class="modal-section"><h4>2. Хранение</h4><p>Архив маршрутов — только в localStorage вашего браузера.</p></div>
-        <div class="modal-section"><h4>3. Cookie</h4><p>Аналитических cookie нет.</p></div>
-        <div class="modal-section"><h4>4. Контакты</h4><p>support@npcgps.space</p></div>
+        <div class="modal-section"><h4>1. Данные</h4><p>Геолокация только с вашего разрешения.</p></div>
+        <div class="modal-section"><h4>2. Хранение</h4><p>Архив маршрутов — в localStorage.</p></div>
+        <div class="modal-section"><h4>3. Контакты</h4><p>support@npcgps.space</p></div>
     </div>
 </div>
 
 <div id="changelogToast" class="changelog-toast" style="display: none;">
-    <h3>🧭 Что нового в NCPGPS?</h3>
+    <h3>🧭 NCPGPS</h3>
     <ul>
-        <li>🎨 <strong>6 тем интерфейса</strong>: Тёмная, Светлая, Синяя, Зелёная, Красная, Фиолетовая</li>
-        <li>📱 <strong>Удобное меню слева сверху</strong></li>
-        <li>📜 <strong>Полная политика конфиденциальности</strong></li>
-        <li>🏷️ <strong>Подпись by KacERORga Prokaznicaet Corporated</strong></li>
-        <li>📍 <strong>Улучшенный GPS</strong> + fallback по IP</li>
+        <li>🗺️ <strong>OpenStreetMap</strong> — быстрые тайлы</li>
+        <li>🎨 <strong>6 цветовых тем</strong> интерфейса</li>
+        <li>📍 <strong>GPS + fallback</strong> по IP</li>
+        <li>⚡ <strong>Работает без API-ключей</strong></li>
     </ul>
-    <button id="closeChangelogBtn">Понятно, погнали!</button>
+    <button id="closeChangelogBtn">Понятно!</button>
 </div>
 
 <div id="cookieToast" class="cookie-toast" style="display: none;">
-    <span>🍪 NCPGPS использует локальное хранилище для архива маршрутов. Мы не передаём ваши данные третьим лицам.</span>
+    <span>🍪 Локальное хранилище для архива маршрутов.</span>
     <button id="acceptCookieBtn">Принять</button>
 </div>
 
 <script>
     window.addEventListener('load', function() {
+        // OpenStreetMap — быстрые тайлы с параллельной загрузкой
+        var mapSource = {
+            type: 'raster',
+            tiles: [
+                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            attribution: '© OpenStreetMap'
+        };
+        
         var map = new maplibregl.Map({
             container: 'map',
             style: {
                 version: 8,
-                sources: { 'osm': { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' } },
-                layers: [{ id: 'osm-layer', type: 'raster', source: 'osm', minzoom: 0, maxzoom: 19 }]
+                sources: { 'osm-source': mapSource },
+                layers: [{ id: 'osm-layer', type: 'raster', source: 'osm-source', minzoom: 0, maxzoom: 19 }]
             },
             center: [37.618423, 55.751244],
-            zoom: 12
+            zoom: 12,
+            fadeDuration: 0
         });
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
         
@@ -620,19 +559,12 @@
         };
         
         document.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.onclick = () => {
-                var theme = btn.dataset.theme;
-                setTheme(theme);
-            };
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
+            btn.onclick = () => setTheme(btn.dataset.theme);
+            btn.addEventListener('click', function(e) { e.stopPropagation(); });
         });
         
         document.addEventListener('click', function(e) {
-            if (!menuPanel.contains(e.target) && e.target !== menuBtn) {
-                menuPanel.classList.remove('active');
-            }
+            if (!menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active');
             if (!settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) {
                 if (!e.target.classList.contains('theme-btn')) {
                     settingsPanel.classList.remove('active');
@@ -640,12 +572,12 @@
             }
         });
         
-        if (!localStorage.getItem('ncp_changelog_seen_v7')) {
+        if (!localStorage.getItem('ncp_changelog_seen_v11')) {
             var changelogDiv = document.getElementById('changelogToast');
             changelogDiv.style.display = 'block';
             document.getElementById('closeChangelogBtn').onclick = function() {
                 changelogDiv.style.display = 'none';
-                localStorage.setItem('ncp_changelog_seen_v7', 'yes');
+                localStorage.setItem('ncp_changelog_seen_v11', 'yes');
             };
         }
         
@@ -675,7 +607,7 @@
                     currentLng = pos.coords.longitude;
                     statusDiv.innerHTML = `📍 ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`;
                     if(userMarker) userMarker.setLngLat([currentLng, currentLat]);
-                    map.flyTo({ center: [currentLng, currentLat], zoom: 13 });
+                    map.flyTo({ center: [currentLng, currentLat], zoom: 13, duration: 500 });
                 },
                 (err) => {
                     statusDiv.innerHTML = '⚠️ GPS недоступен, используем Москву';
@@ -683,7 +615,7 @@
                     if(userMarker) userMarker.setLngLat([currentLng, currentLat]);
                     map.setCenter([currentLng, currentLat]);
                 },
-                { enableHighAccuracy: true, timeout: 10000 }
+                { enableHighAccuracy: true, timeout: 8000 }
             );
         }
         
@@ -742,7 +674,7 @@
         
         document.getElementById('buildRouteCompact').onclick = buildFromInput;
         document.getElementById('cancelRouteBtn').onclick = cancelRoute;
-        document.getElementById('centerBtn').onclick = () => { if (currentLat) map.flyTo({ center: [currentLng, currentLat], zoom: 14 }); };
+        document.getElementById('centerBtn').onclick = () => { if (currentLat) map.flyTo({ center: [currentLng, currentLat], zoom: 14, duration: 500 }); };
         document.getElementById('voiceTrigger').onclick = () => { var u = new SpeechSynthesisUtterance('Навигатор активен'); u.lang = 'ru-RU'; speechSynthesis.cancel(); speechSynthesis.speak(u); };
         document.getElementById('archiveCompact').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         document.getElementById('archiveCompact2').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
