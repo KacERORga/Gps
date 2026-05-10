@@ -3,397 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCPGPS — Быстрый навигатор</title>
+    <title>NCPGPS — Секретные голоса браузера</title>
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: #0a0f1a; 
-            height: 100vh; 
-            overflow: hidden; 
-            position: relative; 
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0a0f1a; height: 100vh; overflow: hidden; }
         
-        /* ========= ТЕМЫ ИНТЕРФЕЙСА ========= */
-        body.dark-theme {
-            background: #0a0f1a;
-        }
-        body.dark-theme .icon-btn,
-        body.dark-theme .search-container,
-        body.dark-theme .bottom-sheet,
-        body.dark-theme .menu-btn,
-        body.dark-theme .menu-panel,
-        body.dark-theme .settings-panel {
-            background: rgba(20, 24, 35, 0.95);
-            color: #e2e8f0;
-            border-color: rgba(255,255,255,0.15);
+        /* Темы */
+        body.dark-theme { background: #0a0f1a; }
+        body.dark-theme .icon-btn, body.dark-theme .search-container, body.dark-theme .bottom-sheet,
+        body.dark-theme .menu-btn, body.dark-theme .menu-panel, body.dark-theme .settings-panel {
+            background: rgba(20, 24, 35, 0.95); color: #e2e8f0; border-color: rgba(255,255,255,0.15);
         }
         body.dark-theme #destinationInput { color: #ffffff; }
-        body.dark-theme .suggestions-list { background: #1e2a3a; }
-        body.dark-theme .suggestion-item { color: #e2e8f0; }
-        body.dark-theme .footer-credit { color: #64748b; }
-        
-        body.light-theme {
-            background: #f1f5f9;
+        body.light-theme { background: #f1f5f9; }
+        body.light-theme .icon-btn, body.light-theme .search-container, body.light-theme .bottom-sheet,
+        body.light-theme .menu-btn, body.light-theme .menu-panel, body.light-theme .settings-panel {
+            background: rgba(255,255,255,0.95); color: #0f172a; border-color: #cbd5e1;
         }
-        body.light-theme .icon-btn,
-        body.light-theme .search-container,
-        body.light-theme .bottom-sheet,
-        body.light-theme .menu-btn,
-        body.light-theme .menu-panel,
-        body.light-theme .settings-panel {
-            background: rgba(255,255,255,0.95);
-            color: #0f172a;
-            border-color: #cbd5e1;
-        }
-        body.light-theme #destinationInput { color: #0f172a; }
-        body.light-theme .suggestions-list { background: #ffffff; }
-        body.light-theme .suggestion-item { color: #1e293b; }
-        body.light-theme .footer-credit { color: #475569; }
-        
         body.blue-theme { background: #0c2d4a; }
-        body.blue-theme .icon-btn, body.blue-theme .search-container, body.blue-theme .bottom-sheet,
-        body.blue-theme .menu-btn, body.blue-theme .menu-panel, body.blue-theme .settings-panel {
-            background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5;
-        }
-        body.blue-theme #destinationInput { color: #f0f9ff; }
-        
         body.green-theme { background: #0a2e1a; }
-        body.green-theme .icon-btn, body.green-theme .search-container, body.green-theme .bottom-sheet,
-        body.green-theme .menu-btn, body.green-theme .menu-panel, body.green-theme .settings-panel {
-            background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e;
-        }
-        body.green-theme #destinationInput { color: #f0fdf4; }
-        
         body.red-theme { background: #3b0a0a; }
-        body.red-theme .icon-btn, body.red-theme .search-container, body.red-theme .bottom-sheet,
-        body.red-theme .menu-btn, body.red-theme .menu-panel, body.red-theme .settings-panel {
-            background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444;
-        }
-        body.red-theme #destinationInput { color: #fef2f2; }
-        
         body.purple-theme { background: #1a0a3b; }
-        body.purple-theme .icon-btn, body.purple-theme .search-container, body.purple-theme .bottom-sheet,
-        body.purple-theme .menu-btn, body.purple-theme .menu-panel, body.purple-theme .settings-panel {
-            background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7;
-        }
-        body.purple-theme #destinationInput { color: #faf5ff; }
         
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #1a2a3a; }
         
-        .side-buttons {
-            position: absolute;
-            bottom: 100px;
-            left: 16px;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .icon-btn {
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            cursor: pointer;
-            border: 1px solid;
-            font-size: 0.8rem;
-            font-weight: 500;
-            min-width: 120px;
-            transition: 0.1s ease;
-        }
-        .icon-btn:active { transform: scale(0.96); opacity: 0.8; }
-        
-        .top-bar {
-            position: absolute;
-            top: 20px;
-            left: 70px;
-            right: 16px;
-            z-index: 20;
-            display: flex;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        .search-container {
-            flex: 1;
-            backdrop-filter: blur(16px);
-            border-radius: 32px;
-            border: 1px solid;
-            position: relative;
-        }
-        .search-input-wrapper {
-            display: flex;
-            align-items: center;
-            padding: 4px 4px 4px 16px;
-        }
-        .search-icon { font-size: 1.2rem; margin-right: 8px; opacity: 0.8; }
-        #destinationInput {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 0;
-            font-size: 1rem;
-            outline: none;
-        }
-        .route-btn {
-            background: #2c6e9e;
-            border-radius: 32px;
-            padding: 8px 20px;
-            font-weight: 600;
-            border: none;
-            color: white;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-        
-        .menu-btn {
-            position: absolute;
-            top: 20px;
-            left: 16px;
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            padding: 8px 16px;
-            font-size: 1rem;
-            font-weight: 500;
-            border: 1px solid;
-            cursor: pointer;
-            z-index: 25;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .menu-panel {
-            position: absolute;
-            top: 70px;
-            left: 16px;
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 12px;
-            z-index: 30;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            border: 1px solid;
-            min-width: 170px;
-        }
+        .side-buttons { position: absolute; bottom: 100px; left: 16px; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
+        .icon-btn { backdrop-filter: blur(12px); border-radius: 40px; display: flex; align-items: center; gap: 8px; padding: 8px 16px; cursor: pointer; border: 1px solid; font-size: 0.8rem; font-weight: 500; min-width: 120px; }
+        .top-bar { position: absolute; top: 20px; left: 70px; right: 16px; z-index: 20; display: flex; gap: 10px; }
+        .search-container { flex: 1; backdrop-filter: blur(16px); border-radius: 32px; border: 1px solid; position: relative; }
+        .search-input-wrapper { display: flex; align-items: center; padding: 4px 4px 4px 16px; }
+        .search-icon { font-size: 1.2rem; margin-right: 8px; }
+        #destinationInput { flex: 1; background: transparent; border: none; padding: 12px 0; font-size: 1rem; outline: none; }
+        .route-btn { background: #2c6e9e; border-radius: 32px; padding: 8px 20px; font-weight: 600; border: none; color: white; cursor: pointer; margin-left: 8px; }
+        .menu-btn { position: absolute; top: 20px; left: 16px; backdrop-filter: blur(12px); border-radius: 40px; padding: 8px 16px; font-size: 1rem; font-weight: 500; border: 1px solid; cursor: pointer; z-index: 25; display: flex; gap: 6px; }
+        .menu-panel { position: absolute; top: 70px; left: 16px; backdrop-filter: blur(20px); border-radius: 28px; padding: 12px; z-index: 30; display: none; flex-direction: column; gap: 8px; border: 1px solid; min-width: 170px; }
         .menu-panel.active { display: flex; }
-        .menu-panel button {
-            background: none;
-            border: none;
-            border-radius: 40px;
-            padding: 10px 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            text-align: left;
-            transition: 0.1s;
-        }
-        .menu-panel button:active { transform: scale(0.96); opacity: 0.7; }
-        
-        .settings-panel {
-            position: absolute;
-            bottom: 140px;
-            left: 16px;
-            right: auto;
-            width: 260px;
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 20px;
-            z-index: 35;
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-            border: 1px solid;
-        }
+        .settings-panel { position: absolute; bottom: 140px; left: 16px; right: auto; width: 320px; backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; z-index: 35; display: none; flex-direction: column; gap: 20px; border: 1px solid; max-height: 70vh; overflow-y: auto; }
         .settings-panel.active { display: flex; }
         .settings-title { font-weight: 600; margin-bottom: 12px; font-size: 0.85rem; text-align: center; }
-        .themes-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-        .theme-btn {
-            border: none;
-            padding: 8px 6px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: 0.1s;
-            text-align: center;
-        }
-        .theme-btn:active { transform: scale(0.96); }
+        .themes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .theme-btn { border: none; padding: 8px 6px; border-radius: 40px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: 0.1s; text-align: center; }
         
-        .suggestions-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+        /* Секретный режим модератора */
+        .secret-toggle {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
             border-radius: 20px;
-            margin-top: 8px;
-            max-height: 260px;
-            overflow-y: auto;
-            z-index: 30;
-            display: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-        }
-        .suggestion-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid;
-        }
-        .suggestion-main { font-weight: 500; }
-        .suggestion-desc { font-size: 0.7rem; margin-top: 2px; opacity: 0.7; }
-        
-        .bottom-sheet {
-            position: absolute;
-            bottom: 20px;
-            left: 16px;
-            right: 16px;
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 10px 16px;
-            z-index: 20;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            font-size: 0.75rem;
-            border: 1px solid;
-        }
-        .route-stats {
-            display: flex;
-            gap: 12px;
-            padding: 5px 12px;
-            border-radius: 40px;
-            align-items: center;
-        }
-        .cancel-route-btn {
-            background: #ef4444;
-            border: none;
-            border-radius: 30px;
-            padding: 4px 12px;
-            color: white;
-            cursor: pointer;
-            margin-left: 6px;
-        }
-        .voice-badge, .archive-chip {
-            padding: 5px 12px;
-            border-radius: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .status-led { width: 8px; height: 8px; border-radius: 10px; background: #4ade80; box-shadow: 0 0 6px #4ade80; display: inline-block; }
-        
-        .footer-credit {
-            position: absolute;
-            bottom: 8px;
-            left: 0;
-            right: 0;
             text-align: center;
-            font-size: 0.6rem;
-            z-index: 15;
-            pointer-events: none;
-        }
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
-        }
-        .modal-overlay.active { visibility: visible; opacity: 1; }
-        .modal-content {
-            background: #0f1219;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            border-radius: 32px;
-            border: 1px solid #2d3e5a;
-            padding: 24px 20px;
-            position: relative;
-            overflow-y: auto;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-        }
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            font-size: 28px;
             cursor: pointer;
-            color: #aaa;
+            font-size: 0.7rem;
+            color: #64748b;
         }
-        .modal-title { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg,#60a5fa,#a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px; }
-        .modal-section { margin-bottom: 20px; border-bottom: 1px solid #1e2a3a; padding-bottom: 12px; }
-        .modal-section h4 { color: #60a5fa; margin-bottom: 8px; }
-        
-        .changelog-toast {
-            position: fixed;
-            top: 100px;
-            left: 16px;
-            right: 16px;
-            background: #1a2a3aee;
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 16px;
-            z-index: 350;
-            border-left: 4px solid #facc15;
-            color: white;
-            font-size: 0.8rem;
-            max-height: 60vh;
-            overflow-y: auto;
+        .secret-panel {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
         }
-        .changelog-toast h3 { color: #facc15; margin-bottom: 8px; }
-        .changelog-toast button { background: #2c6e9e; border: none; padding: 6px 16px; border-radius: 40px; color: white; margin-top: 12px; cursor: pointer; }
-        
-        .cookie-toast {
-            position: fixed;
-            bottom: 100px;
-            left: 16px;
-            right: 16px;
-            background: #1a2a3aee;
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 14px 18px;
-            z-index: 300;
-            border-left: 4px solid #60a5fa;
-            color: white;
-            font-size: 0.75rem;
+        .secret-panel.active { display: block; }
+        .secret-panel input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 30px;
+            border: none;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .voice-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 50px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid transparent;
         }
-        .cookie-toast button { background: #2c6e9e; border: none; padding: 6px 16px; border-radius: 40px; color: white; cursor: pointer; }
+        .voice-item.active { border-color: #4ade80; background: rgba(74, 222, 128, 0.15); }
+        .voice-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .voice-name { font-weight: 600; font-size: 0.85rem; }
+        .voice-desc { font-size: 0.65rem; opacity: 0.7; }
+        .voice-test-btn { background: #2c6e9e; border: none; border-radius: 30px; padding: 6px 14px; color: white; font-size: 0.7rem; cursor: pointer; }
         
-        @media (max-width: 600px) {
-            .icon-btn { padding: 5px 10px; min-width: 100px; font-size: 0.7rem; }
-            .top-bar { left: 65px; }
-            .settings-panel { width: 240px; }
-        }
+        .bottom-sheet { position: absolute; bottom: 20px; left: 16px; right: 16px; backdrop-filter: blur(20px); border-radius: 28px; padding: 10px 16px; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; font-size: 0.75rem; border: 1px solid; }
+        .route-stats { display: flex; gap: 16px; padding: 5px 12px; border-radius: 40px; align-items: center; font-weight: 600; }
+        .cancel-route-btn { background: #ef4444; border: none; border-radius: 30px; padding: 4px 12px; color: white; cursor: pointer; }
+        .status-led { width: 8px; height: 8px; border-radius: 10px; background: #4ade80; display: inline-block; margin-right: 6px; }
+        .footer-credit { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.6rem; z-index: 15; pointer-events: none; }
+        .suggestions-list { position: absolute; top: 100%; left: 0; right: 0; border-radius: 20px; margin-top: 8px; max-height: 260px; overflow-y: auto; z-index: 30; display: none; background: #1e2a3a; }
+        .suggestion-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        @media (max-width: 600px) { .icon-btn { padding: 5px 10px; min-width: 100px; } .top-bar { left: 65px; } .settings-panel { width: 280px; } }
     </style>
 </head>
 <body class="dark-theme">
@@ -401,7 +107,6 @@
 <div id="map"></div>
 
 <button class="menu-btn" id="menuBtn">☰ Меню</button>
-
 <div id="menuPanel" class="menu-panel">
     <button id="promoMenuItem">✨ О проекте</button>
     <button id="settingsMenuItem">⚙️ Настройки</button>
@@ -418,6 +123,19 @@
             <button class="theme-btn" data-theme="red">❤️ Красная</button>
             <button class="theme-btn" data-theme="purple">💜 Фиолетовая</button>
         </div>
+    </div>
+    <div>
+        <div class="settings-title">🎙️ Голос навигатора</div>
+        <div id="voicesList"></div>
+        
+        <!-- Секретный режим модератора -->
+        <div class="secret-toggle" id="secretToggle">🔐 Режим модератора</div>
+        <div class="secret-panel" id="secretPanel">
+            <input type="password" id="secretPassword" placeholder="Введите пароль" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+            <button id="unlockSecretBtn" style="width:100%; padding:8px; border-radius:30px; border:none; background:#2c6e9e; color:white; cursor:pointer;">Разблокировать</button>
+            <div id="secretStatus" style="font-size:0.7rem; text-align:center; margin-top:8px;"></div>
+        </div>
+        <div style="font-size:0.6rem; text-align:center; margin-top:8px;">🔊 Нажми на голос для выбора. Кнопка 🔥 — тест</div>
     </div>
 </div>
 
@@ -450,68 +168,205 @@
 
 <div class="footer-credit">by KacERORga Prokaznicaet Corporated</div>
 
-<div id="promoModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-close" id="promoCloseBtn">&times;</div>
-        <div class="modal-title">🧭 NCPGPS</div>
-        <div class="modal-section"><h4>📜 О проекте</h4><p>Независимый навигатор принятых решений.</p></div>
-        <div class="modal-section"><h4>🔒 Политика конфиденциальности</h4><p><a href="#" id="openPolicyBtn" style="color:#60a5fa;">📄 Полная версия →</a></p></div>
-    </div>
-</div>
-
-<div id="policyModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-close" id="policyCloseBtn">&times;</div>
-        <div class="modal-title">🔒 Политика конфиденциальности</div>
-        <div class="modal-section"><h4>1. Данные</h4><p>Геолокация только с вашего разрешения.</p></div>
-        <div class="modal-section"><h4>2. Хранение</h4><p>Архив маршрутов — в localStorage.</p></div>
-        <div class="modal-section"><h4>3. Контакты</h4><p>support@npcgps.space</p></div>
-    </div>
-</div>
-
-<div id="changelogToast" class="changelog-toast" style="display: none;">
-    <h3>🧭 NCPGPS</h3>
-    <ul>
-        <li>🗺️ <strong>OpenStreetMap</strong> — быстрые тайлы</li>
-        <li>🎨 <strong>6 цветовых тем</strong> интерфейса</li>
-        <li>📍 <strong>GPS + fallback</strong> по IP</li>
-        <li>⚡ <strong>Работает без API-ключей</strong></li>
-    </ul>
-    <button id="closeChangelogBtn">Понятно!</button>
-</div>
-
-<div id="cookieToast" class="cookie-toast" style="display: none;">
-    <span>🍪 Локальное хранилище для архива маршрутов.</span>
-    <button id="acceptCookieBtn">Принять</button>
-</div>
-
 <script>
     window.addEventListener('load', function() {
-        // OpenStreetMap — быстрые тайлы с параллельной загрузкой
-        var mapSource = {
-            type: 'raster',
-            tiles: [
-                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            ],
-            tileSize: 256,
-            attribution: '© OpenStreetMap'
-        };
-        
+        // ========== КАРТА ==========
         var map = new maplibregl.Map({
             container: 'map',
             style: {
                 version: 8,
-                sources: { 'osm-source': mapSource },
-                layers: [{ id: 'osm-layer', type: 'raster', source: 'osm-source', minzoom: 0, maxzoom: 19 }]
+                sources: { 'osm': { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' } },
+                layers: [{ id: 'osm-layer', type: 'raster', source: 'osm', minzoom: 0, maxzoom: 19 }]
             },
             center: [37.618423, 55.751244],
             zoom: 12,
             fadeDuration: 0
         });
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+        // ========== ГОЛОСА ==========
+        let currentVoiceURI = localStorage.getItem('ncp_voice_uri') || '';
+        let currentVoiceName = localStorage.getItem('ncp_voice_name') || 'Системный';
+        let isModeratorMode = localStorage.getItem('ncp_moderator') === 'true';
+        let allSystemVoices = [];
         
+        // Функция озвучки через Web Speech API
+        function speakText(text, voiceURI) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ru-RU';
+            utterance.rate = 0.9;
+            
+            if (voiceURI) {
+                const voices = window.speechSynthesis.getVoices();
+                const targetVoice = voices.find(v => v.voiceURI === voiceURI);
+                if (targetVoice) utterance.voice = targetVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        // Функция для навигации
+        function speakNCP(text) {
+            speakText(text, currentVoiceURI);
+        }
+        
+        // Сборка списка голосов
+        function buildVoicesList() {
+            const container = document.getElementById('voicesList');
+            container.innerHTML = '';
+            
+            // Всегда показываем системный голос (по умолчанию)
+            const defaultItem = document.createElement('div');
+            defaultItem.className = 'voice-item';
+            if (!currentVoiceURI) defaultItem.classList.add('active');
+            defaultItem.innerHTML = `
+                <div class="voice-info">
+                    <div class="voice-name">🔊 Системный голос</div>
+                    <div class="voice-desc">Голос вашего устройства по умолчанию</div>
+                </div>
+                <button class="voice-test-btn" data-voice-uri="">🔥 Тест</button>
+            `;
+            defaultItem.addEventListener('click', (e) => {
+                if (e.target.classList.contains('voice-test-btn')) return;
+                currentVoiceURI = '';
+                currentVoiceName = 'Системный';
+                localStorage.setItem('ncp_voice_uri', '');
+                localStorage.setItem('ncp_voice_name', 'Системный');
+                document.querySelectorAll('.voice-item').forEach(i => i.classList.remove('active'));
+                defaultItem.classList.add('active');
+                speakText('Голос изменён на системный', '');
+            });
+            const defaultTestBtn = defaultItem.querySelector('.voice-test-btn');
+            defaultTestBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                speakText('Тестовое сообщение. Голос системный.', '');
+            });
+            container.appendChild(defaultItem);
+            
+            // Если режим модератора включён — показываем все русские голоса из системы
+            if (isModeratorMode && allSystemVoices.length > 0) {
+                const ruVoices = allSystemVoices.filter(v => v.lang.startsWith('ru'));
+                if (ruVoices.length === 0) {
+                    const noVoiceDiv = document.createElement('div');
+                    noVoiceDiv.style.textAlign = 'center';
+                    noVoiceDiv.style.padding = '20px';
+                    noVoiceDiv.style.fontSize = '0.7rem';
+                    noVoiceDiv.style.opacity = '0.6';
+                    noVoiceDiv.innerText = '⚠️ Русские голоса не найдены в вашей системе';
+                    container.appendChild(noVoiceDiv);
+                } else {
+                    ruVoices.forEach(voice => {
+                        const isActive = currentVoiceURI === voice.voiceURI;
+                        const item = document.createElement('div');
+                        item.className = 'voice-item';
+                        if (isActive) item.classList.add('active');
+                        const genderIcon = voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('zira') ? '👩' : '👨';
+                        item.innerHTML = `
+                            <div class="voice-info">
+                                <div class="voice-name">${genderIcon} ${voice.name}</div>
+                                <div class="voice-desc">${voice.lang} — ${voice.voiceURI.split('/').pop()}</div>
+                            </div>
+                            <button class="voice-test-btn" data-voice-uri="${voice.voiceURI}" data-voice-name="${voice.name}">🔥 Тест</button>
+                        `;
+                        item.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('voice-test-btn')) return;
+                            currentVoiceURI = voice.voiceURI;
+                            currentVoiceName = voice.name;
+                            localStorage.setItem('ncp_voice_uri', currentVoiceURI);
+                            localStorage.setItem('ncp_voice_name', currentVoiceName);
+                            document.querySelectorAll('.voice-item').forEach(i => i.classList.remove('active'));
+                            item.classList.add('active');
+                            speakText(`Голос изменён на ${voice.name}`, voice.voiceURI);
+                        });
+                        const testBtn = item.querySelector('.voice-test-btn');
+                        testBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            speakText('Тестовое сообщение. Этот голос звучит отлично.', voice.voiceURI);
+                        });
+                        container.appendChild(item);
+                    });
+                }
+            } else if (isModeratorMode && allSystemVoices.length === 0) {
+                // Ждём загрузки голосов
+                const loadingDiv = document.createElement('div');
+                loadingDiv.style.textAlign = 'center';
+                loadingDiv.style.padding = '20px';
+                loadingDiv.style.fontSize = '0.7rem';
+                loadingDiv.innerText = '⏳ Загрузка голосов системы...';
+                container.appendChild(loadingDiv);
+                setTimeout(() => buildVoicesList(), 500);
+            }
+        }
+        
+        // Загрузка системных голосов
+        function loadSystemVoices() {
+            if (!window.speechSynthesis) return;
+            allSystemVoices = window.speechSynthesis.getVoices();
+            if (allSystemVoices.length === 0) {
+                setTimeout(loadSystemVoices, 200);
+                return;
+            }
+            buildVoicesList();
+        }
+        
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+            loadSystemVoices();
+        }
+        
+        // ========== СЕКРЕТНЫЙ РЕЖИМ МОДЕРАТОРА (пароль 6369) ==========
+        const secretToggle = document.getElementById('secretToggle');
+        const secretPanel = document.getElementById('secretPanel');
+        const secretPassword = document.getElementById('secretPassword');
+        const unlockBtn = document.getElementById('unlockSecretBtn');
+        const secretStatus = document.getElementById('secretStatus');
+        
+        secretToggle.addEventListener('click', () => {
+            if (isModeratorMode) {
+                // Если уже разблокировано — показываем статус
+                secretStatus.innerHTML = '✅ Режим модератора активен';
+                secretStatus.style.color = '#4ade80';
+                secretPanel.classList.add('active');
+            } else {
+                secretPanel.classList.toggle('active');
+                secretPassword.value = '';
+                secretStatus.innerHTML = '';
+            }
+        });
+        
+        function unlockModerator() {
+            const pass = secretPassword.value;
+            if (pass === '6369') {
+                isModeratorMode = true;
+                localStorage.setItem('ncp_moderator', 'true');
+                secretStatus.innerHTML = '✅ Режим модератора активирован! Голоса загружены.';
+                secretStatus.style.color = '#4ade80';
+                setTimeout(() => {
+                    secretPanel.classList.remove('active');
+                }, 1500);
+                // Перезагружаем список голосов
+                buildVoicesList();
+                speakText('Режим модератора активирован. Доступны все голоса системы.', currentVoiceURI);
+            } else {
+                secretStatus.innerHTML = '❌ Неверный пароль';
+                secretStatus.style.color = '#ef4444';
+            }
+        }
+        
+        unlockBtn.addEventListener('click', unlockModerator);
+        secretPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') unlockModerator();
+        });
+        
+        // Если уже был включён режим модератора
+        if (isModeratorMode) {
+            secretStatus.innerHTML = '✅ Режим модератора активен';
+            secretStatus.style.color = '#4ade80';
+        }
+        
+        // ========== ОСТАЛЬНОЙ ФУНКЦИОНАЛ ==========
         var userMarker = new maplibregl.Marker({ color: '#3b82f6' }).setLngLat([37.618423, 55.751244]).addTo(map);
         var destMarkers = [];
         var routeSources = [];
@@ -519,132 +374,61 @@
         var routeHistory = [];
         var continueBtn = null;
         var lastTap = 0;
-        
-        try {
-            var stored = localStorage.getItem('ncp_gps_history');
-            if (stored) routeHistory = JSON.parse(stored);
-            document.getElementById('archiveCount').innerText = routeHistory.length;
-        } catch(e) {}
-        
+
+        try { var stored = localStorage.getItem('ncp_gps_history'); if (stored) routeHistory = JSON.parse(stored); document.getElementById('archiveCount').innerText = routeHistory.length; } catch(e) {}
+
         function setTheme(theme) {
             document.body.classList.remove('dark-theme', 'light-theme', 'blue-theme', 'green-theme', 'red-theme', 'purple-theme');
             document.body.classList.add(theme + '-theme');
             localStorage.setItem('ncp_theme', theme);
         }
-        
         var savedTheme = localStorage.getItem('ncp_theme');
-        if (savedTheme && savedTheme !== 'null') setTheme(savedTheme);
-        else setTheme('dark');
-        
+        if (savedTheme && savedTheme !== 'null') setTheme(savedTheme); else setTheme('dark');
+
         var menuPanel = document.getElementById('menuPanel');
         var settingsPanel = document.getElementById('settingsPanel');
         var menuBtn = document.getElementById('menuBtn');
-        
-        menuBtn.onclick = function(e) {
-            e.stopPropagation();
-            menuPanel.classList.toggle('active');
-            settingsPanel.classList.remove('active');
-        };
-        
-        document.getElementById('settingsMenuItem').onclick = function(e) {
-            e.stopPropagation();
-            settingsPanel.classList.toggle('active');
-            menuPanel.classList.remove('active');
-        };
-        
-        document.getElementById('promoMenuItem').onclick = function(e) {
-            e.stopPropagation();
-            document.getElementById('promoModal').classList.add('active');
-            menuPanel.classList.remove('active');
-        };
-        
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.onclick = () => setTheme(btn.dataset.theme);
-            btn.addEventListener('click', function(e) { e.stopPropagation(); });
-        });
-        
-        document.addEventListener('click', function(e) {
-            if (!menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active');
-            if (!settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) {
-                if (!e.target.classList.contains('theme-btn')) {
-                    settingsPanel.classList.remove('active');
-                }
-            }
-        });
-        
-        if (!localStorage.getItem('ncp_changelog_seen_v11')) {
-            var changelogDiv = document.getElementById('changelogToast');
-            changelogDiv.style.display = 'block';
-            document.getElementById('closeChangelogBtn').onclick = function() {
-                changelogDiv.style.display = 'none';
-                localStorage.setItem('ncp_changelog_seen_v11', 'yes');
-            };
-        }
-        
-        if (localStorage.getItem('ncp_consent') !== 'yes') {
-            var cookieDiv = document.getElementById('cookieToast');
-            cookieDiv.style.display = 'flex';
-            document.getElementById('acceptCookieBtn').onclick = function() {
-                localStorage.setItem('ncp_consent', 'yes');
-                cookieDiv.style.display = 'none';
-            };
-        }
-        
+        menuBtn.onclick = function(e) { e.stopPropagation(); menuPanel.classList.toggle('active'); settingsPanel.classList.remove('active'); };
+        document.getElementById('settingsMenuItem').onclick = function(e) { e.stopPropagation(); settingsPanel.classList.toggle('active'); menuPanel.classList.remove('active'); };
+        document.getElementById('promoMenuItem').onclick = function(e) { e.stopPropagation(); alert('🧭 NCPGPS — Независимый центр прокладывания маршрутов.\nМаршруты принимаются здесь. Где здесь — неизвестно.'); menuPanel.classList.remove('active'); };
+        document.querySelectorAll('.theme-btn').forEach(btn => { btn.onclick = () => setTheme(btn.dataset.theme); btn.addEventListener('click', function(e) { e.stopPropagation(); }); });
+        document.addEventListener('click', function(e) { if (!menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active'); if (!settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) { if (!e.target.classList.contains('theme-btn') && !e.target.closest('.voice-item')) settingsPanel.classList.remove('active'); } });
+
+        if (!localStorage.getItem('ncp_consent')) { var acceptance = confirm('🍪 NCPGPS использует локальное хранилище для архива маршрутов. Продолжая, вы соглашаетесь.'); if(acceptance) localStorage.setItem('ncp_consent', 'yes'); }
+
         function startGPS() {
             var statusDiv = document.getElementById('coordStatus');
-            if (!navigator.geolocation) {
-                statusDiv.innerHTML = '❌ GPS не поддерживается';
-                currentLat = 55.751244; currentLng = 37.618423;
-                if(userMarker) userMarker.setLngLat([currentLng, currentLat]);
-                map.setCenter([currentLng, currentLat]);
-                statusDiv.innerHTML = '📍 Москва (по умолчанию)';
-                return;
-            }
+            if (!navigator.geolocation) { statusDiv.innerHTML = '❌ GPS не поддерживается'; currentLat = 55.751244; currentLng = 37.618423; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.setCenter([currentLng, currentLat]); statusDiv.innerHTML = '📍 Москва (по умолчанию)'; return; }
             statusDiv.innerHTML = '📍 Запрос GPS...';
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    currentLat = pos.coords.latitude;
-                    currentLng = pos.coords.longitude;
-                    statusDiv.innerHTML = `📍 ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`;
-                    if(userMarker) userMarker.setLngLat([currentLng, currentLat]);
-                    map.flyTo({ center: [currentLng, currentLat], zoom: 13, duration: 500 });
-                },
-                (err) => {
-                    statusDiv.innerHTML = '⚠️ GPS недоступен, используем Москву';
-                    currentLat = 55.751244; currentLng = 37.618423;
-                    if(userMarker) userMarker.setLngLat([currentLng, currentLat]);
-                    map.setCenter([currentLng, currentLat]);
-                },
+                (pos) => { currentLat = pos.coords.latitude; currentLng = pos.coords.longitude; statusDiv.innerHTML = `📍 ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.flyTo({ center: [currentLng, currentLat], zoom: 13, duration: 500 }); speakNCP('Ваше местоположение определено'); },
+                (err) => { statusDiv.innerHTML = '⚠️ GPS недоступен, используем Москву'; currentLat = 55.751244; currentLng = 37.618423; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.setCenter([currentLng, currentLat]); },
                 { enableHighAccuracy: true, timeout: 8000 }
             );
         }
-        
+
         async function buildRouteTo(startLat, startLng, endLat, endLng) {
             if (startLat === null || endLat === null) return;
-            destMarkers.forEach(m => m.remove());
-            destMarkers = [];
+            destMarkers.forEach(m => m.remove()); destMarkers = [];
             routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); });
             routeSources = [];
             var destMarker = new maplibregl.Marker({ color: '#ef4444' }).setLngLat([endLng, endLat]).addTo(map);
             destMarkers.push(destMarker);
             var url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
             try {
-                var resp = await fetch(url);
-                var data = await resp.json();
+                var resp = await fetch(url); var data = await resp.json();
                 if (data.code === 'Ok' && data.routes.length) {
-                    var route = data.routes[0];
-                    var srcId = 'route_' + Date.now();
+                    var route = data.routes[0]; var srcId = 'route_' + Date.now();
                     map.addSource(srcId, { type: 'geojson', data: { type: 'Feature', geometry: route.geometry } });
                     map.addLayer({ id: srcId, type: 'line', source: srcId, paint: { 'line-color': '#3b82f6', 'line-width': 5 } });
                     routeSources.push(srcId);
-                    var bounds = new maplibregl.LngLatBounds();
-                    route.geometry.coordinates.forEach(c => bounds.extend([c[0], c[1]]));
+                    var bounds = new maplibregl.LngLatBounds(); route.geometry.coordinates.forEach(c => bounds.extend([c[0], c[1]]));
                     map.fitBounds(bounds, { padding: 50 });
-                    var dist = (route.distance / 1000).toFixed(1);
-                    var dur = Math.round(route.duration / 60);
+                    var dist = (route.distance / 1000).toFixed(1); var dur = Math.round(route.duration / 60);
                     document.getElementById('routeDistance').innerHTML = dist + ' км';
                     document.getElementById('routeDuration').innerHTML = dur + ' мин';
                     document.getElementById('routeStatsBox').style.display = 'flex';
+                    speakNCP(`Маршрут принят. ${dist} км, ${dur} минут.`);
                     routeHistory.unshift({ text: dist + 'км / ' + dur + 'мин', time: new Date().toLocaleTimeString() });
                     if (routeHistory.length > 12) routeHistory.pop();
                     localStorage.setItem('ncp_gps_history', JSON.stringify(routeHistory));
@@ -652,91 +436,24 @@
                 } else { alert('Маршрут не найден'); }
             } catch(e) { alert('Ошибка маршрута'); }
         }
-        
-        async function buildFromInput() {
-            var dest = document.getElementById('destinationInput').value.trim();
-            if (!dest) { alert('Введите адрес'); return; }
-            if (currentLat === null) { alert('Подождите GPS'); return; }
-            try {
-                var resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1`);
-                var data = await resp.json();
-                if (data.length) await buildRouteTo(currentLat, currentLng, parseFloat(data[0].lat), parseFloat(data[0].lon));
-                else alert('Адрес не найден');
-            } catch(e) { alert('Ошибка поиска'); }
-        }
-        
-        function cancelRoute() {
-            destMarkers.forEach(m => m.remove()); destMarkers = [];
-            routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); });
-            routeSources = [];
-            document.getElementById('routeStatsBox').style.display = 'none';
-        }
-        
+
+        async function buildFromInput() { var dest = document.getElementById('destinationInput').value.trim(); if (!dest) { alert('Введите адрес'); return; } if (currentLat === null) { alert('Подождите GPS'); return; } try { var resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1`); var data = await resp.json(); if (data.length) await buildRouteTo(currentLat, currentLng, parseFloat(data[0].lat), parseFloat(data[0].lon)); else alert('Адрес не найден'); } catch(e) { alert('Ошибка поиска'); } }
+        function cancelRoute() { destMarkers.forEach(m => m.remove()); destMarkers = []; routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); }); routeSources = []; document.getElementById('routeStatsBox').style.display = 'none'; speakNCP('Маршрут отменён'); }
         document.getElementById('buildRouteCompact').onclick = buildFromInput;
         document.getElementById('cancelRouteBtn').onclick = cancelRoute;
         document.getElementById('centerBtn').onclick = () => { if (currentLat) map.flyTo({ center: [currentLng, currentLat], zoom: 14, duration: 500 }); };
-        document.getElementById('voiceTrigger').onclick = () => { var u = new SpeechSynthesisUtterance('Навигатор активен'); u.lang = 'ru-RU'; speechSynthesis.cancel(); speechSynthesis.speak(u); };
+        document.getElementById('voiceTrigger').onclick = () => speakNCP('Навигатор активен');
         document.getElementById('archiveCompact').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         document.getElementById('archiveCompact2').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         
-        var promoModal = document.getElementById('promoModal');
-        var policyModal = document.getElementById('policyModal');
-        document.getElementById('promoCloseBtn').onclick = () => promoModal.classList.remove('active');
-        promoModal.onclick = (e) => { if (e.target === promoModal) promoModal.classList.remove('active'); };
-        document.getElementById('openPolicyBtn').onclick = (e) => { e.preventDefault(); promoModal.classList.remove('active'); policyModal.classList.add('active'); };
-        document.getElementById('policyCloseBtn').onclick = () => policyModal.classList.remove('active');
-        policyModal.onclick = (e) => { if (e.target === policyModal) policyModal.classList.remove('active'); };
-        
         var input = document.getElementById('destinationInput');
         var suggestTimeout;
-        input.addEventListener('input', function() {
-            clearTimeout(suggestTimeout);
-            var q = this.value.trim();
-            if (q.length < 2) { document.getElementById('suggestionsList').style.display = 'none'; return; }
-            suggestTimeout = setTimeout(async () => {
-                try {
-                    var res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=4&addressdetails=1`);
-                    var data = await res.json();
-                    var listDiv = document.getElementById('suggestionsList');
-                    listDiv.innerHTML = '';
-                    if (data.length) {
-                        data.forEach(p => {
-                            var addr = p.address || {};
-                            var desc = [addr.city || addr.town || addr.village, addr.state, addr.country].filter(Boolean).join(', ');
-                            var div = document.createElement('div');
-                            div.className = 'suggestion-item';
-                            div.innerHTML = `<div class="suggestion-main">${p.display_name.split(',')[0]}</div><div class="suggestion-desc">${desc}</div>`;
-                            div.onclick = () => {
-                                input.value = p.display_name;
-                                listDiv.style.display = 'none';
-                                if (currentLat) buildRouteTo(currentLat, currentLng, parseFloat(p.lat), parseFloat(p.lon));
-                            };
-                            listDiv.appendChild(div);
-                        });
-                        listDiv.style.display = 'block';
-                    } else listDiv.style.display = 'none';
-                } catch(e) { console.error(e); }
-            }, 300);
-        });
+        input.addEventListener('input', function() { clearTimeout(suggestTimeout); var q = this.value.trim(); if (q.length < 2) { document.getElementById('suggestionsList').style.display = 'none'; return; } suggestTimeout = setTimeout(async () => { try { var res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=4&addressdetails=1`); var data = await res.json(); var listDiv = document.getElementById('suggestionsList'); listDiv.innerHTML = ''; if (data.length) { data.forEach(p => { var addr = p.address || {}; var desc = [addr.city || addr.town || addr.village, addr.state, addr.country].filter(Boolean).join(', '); var div = document.createElement('div'); div.className = 'suggestion-item'; div.innerHTML = `<div class="suggestion-main">${p.display_name.split(',')[0]}</div><div class="suggestion-desc">${desc}</div>`; div.onclick = () => { input.value = p.display_name; listDiv.style.display = 'none'; if (currentLat) buildRouteTo(currentLat, currentLng, parseFloat(p.lat), parseFloat(p.lon)); }; listDiv.appendChild(div); }); listDiv.style.display = 'block'; } else listDiv.style.display = 'none'; } catch(e) { console.error(e); } }, 300); });
         document.addEventListener('click', (e) => { if (!document.querySelector('.search-container')?.contains(e.target)) document.getElementById('suggestionsList').style.display = 'none'; });
         
-        map.on('contextmenu', (e) => {
-            e.preventDefault();
-            if (continueBtn) continueBtn.remove();
-            var btn = document.createElement('button');
-            btn.innerText = '🚗 Продолжить маршрут до сюда';
-            btn.style.cssText = 'position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:#2c6e9e; padding:12px 20px; border-radius:40px; border:none; color:white; font-weight:bold; z-index:300; cursor:pointer;';
-            btn.onclick = () => { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); btn.remove(); };
-            document.body.appendChild(btn);
-            setTimeout(() => btn.remove(), 8000);
-            continueBtn = btn;
-        });
+        map.on('contextmenu', (e) => { e.preventDefault(); if (continueBtn) continueBtn.remove(); var btn = document.createElement('button'); btn.innerText = '🚗 Продолжить маршрут до сюда'; btn.style.cssText = 'position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:#2c6e9e; padding:12px 20px; border-radius:40px; border:none; color:white; font-weight:bold; z-index:300; cursor:pointer;'; btn.onclick = () => { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); btn.remove(); }; document.body.appendChild(btn); setTimeout(() => btn.remove(), 8000); continueBtn = btn; });
         
-        map.on('click', (e) => {
-            var now = Date.now();
-            if (now - lastTap < 300) { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); }
-            lastTap = now;
-        });
+        map.on('click', (e) => { var now = Date.now(); if (now - lastTap < 300) { if (currentLat) buildRouteTo(currentLat, currentLng, e.lngLat.lat, e.lngLat.lng); } lastTap = now; });
         
         startGPS();
     });
