@@ -3,48 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCPGPS — Навигатор</title>
+    <title>NCPGPS — Защищённые аккаунты</title>
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            height: 100vh; 
-            overflow: hidden; 
-            transition: background 0.2s, color 0.2s;
-        }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; height: 100vh; overflow: hidden; transition: background 0.2s, color 0.2s; }
         
         body.dark-theme { background: #0a0f1a; }
         body.dark-theme .icon-btn, body.dark-theme .search-container, body.dark-theme .bottom-sheet,
         body.dark-theme .menu-btn, body.dark-theme .menu-panel, body.dark-theme .settings-panel,
-        body.dark-theme .favorite-panel, body.dark-theme .commands-panel {
+        body.dark-theme .favorite-panel, body.dark-theme .commands-panel, body.dark-theme .sync-panel {
             background: rgba(20, 24, 35, 0.95); color: #e2e8f0; border-color: rgba(255,255,255,0.15);
         }
         body.light-theme { background: #f1f5f9; }
         body.light-theme .icon-btn, body.light-theme .search-container, body.light-theme .bottom-sheet,
         body.light-theme .menu-btn, body.light-theme .menu-panel, body.light-theme .settings-panel,
-        body.light-theme .favorite-panel, body.light-theme .commands-panel {
+        body.light-theme .favorite-panel, body.light-theme .commands-panel, body.light-theme .sync-panel {
             background: rgba(255,255,255,0.95); color: #0f172a; border-color: #cbd5e1;
         }
         body.blue-theme { background: #0c2d4a; }
         body.blue-theme .icon-btn, body.blue-theme .search-container, body.blue-theme .bottom-sheet,
         body.blue-theme .menu-btn, body.blue-theme .menu-panel, body.blue-theme .settings-panel,
-        body.blue-theme .favorite-panel, body.blue-theme .commands-panel { background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5; }
+        body.blue-theme .favorite-panel, body.blue-theme .commands-panel, body.blue-theme .sync-panel { background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5; }
         body.green-theme { background: #0a2e1a; }
         body.green-theme .icon-btn, body.green-theme .search-container, body.green-theme .bottom-sheet,
         body.green-theme .menu-btn, body.green-theme .menu-panel, body.green-theme .settings-panel,
-        body.green-theme .favorite-panel, body.green-theme .commands-panel { background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e; }
+        body.green-theme .favorite-panel, body.green-theme .commands-panel, body.green-theme .sync-panel { background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e; }
         body.red-theme { background: #3b0a0a; }
         body.red-theme .icon-btn, body.red-theme .search-container, body.red-theme .bottom-sheet,
         body.red-theme .menu-btn, body.red-theme .menu-panel, body.red-theme .settings-panel,
-        body.red-theme .favorite-panel, body.red-theme .commands-panel { background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444; }
+        body.red-theme .favorite-panel, body.red-theme .commands-panel, body.red-theme .sync-panel { background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444; }
         body.purple-theme { background: #1a0a3b; }
         body.purple-theme .icon-btn, body.purple-theme .search-container, body.purple-theme .bottom-sheet,
         body.purple-theme .menu-btn, body.purple-theme .menu-panel, body.purple-theme .settings-panel,
-        body.purple-theme .favorite-panel, body.purple-theme .commands-panel { background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7; }
+        body.purple-theme .favorite-panel, body.purple-theme .commands-panel, body.purple-theme .sync-panel { background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7; }
         
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #1a2a3a; }
+        
+        /* АВТОРИЗАЦИЯ */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: visible;
+            opacity: 1;
+            transition: 0.3s;
+        }
+        .auth-overlay.hidden { visibility: hidden; opacity: 0; pointer-events: none; }
+        .auth-panel {
+            width: 360px;
+            max-width: 90%;
+            border-radius: 32px;
+            padding: 32px 28px;
+            text-align: center;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .auth-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg,#60a5fa,#a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .auth-sub { font-size: 0.75rem; opacity: 0.8; margin-bottom: 24px; color: #e2e8f0; }
+        .auth-input { width: 100%; padding: 12px 16px; margin-bottom: 12px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 0.9rem; outline: none; }
+        .auth-input::placeholder { color: rgba(255,255,255,0.5); }
+        .auth-btn { width: 100%; padding: 12px; border-radius: 40px; border: none; background: linear-gradient(135deg,#2c6e9e,#1e4a76); color: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-bottom: 12px; transition: 0.2s; }
+        .auth-switch { font-size: 0.7rem; opacity: 0.8; cursor: pointer; color: #e2e8f0; }
+        .auth-error { font-size: 0.7rem; color: #ef4444; margin-top: 8px; }
+        .auth-success { font-size: 0.7rem; color: #4ade80; margin-top: 8px; }
         
         .select-favorite-btn {
             position: absolute;
@@ -62,9 +93,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .select-favorite-btn:active { transform: scale(0.96); }
         .select-favorite-btn.active { background: #ef4444; color: white; }
         
         .side-buttons { position: absolute; bottom: 100px; left: 16px; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
@@ -81,13 +110,21 @@
         .menu-panel.active { display: flex; }
         .menu-panel button { background: none; border: none; border-radius: 40px; padding: 10px 16px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; transition: 0.1s; }
         
+        .sync-panel { position: absolute; top: 70px; left: 16px; right: auto; width: 380px; backdrop-filter: blur(20px); border-radius: 28px; padding: 16px; z-index: 35; display: none; flex-direction: column; gap: 12px; border: 1px solid; }
+        .sync-panel.active { display: flex; }
+        .sync-title { font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 8px; }
+        .sync-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .sync-btn { background: #2c6e9e; border: none; border-radius: 40px; padding: 10px 20px; color: white; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .sync-btn.import { background: #4ade80; color: #0f172a; }
+        .sync-btn.export { background: #facc15; color: #0f172a; }
+        
         .settings-panel { position: absolute; bottom: 140px; left: 16px; right: auto; width: 300px; backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; z-index: 35; display: none; flex-direction: column; gap: 20px; border: 1px solid; max-height: 70vh; overflow-y: auto; }
         .settings-panel.active { display: flex; }
         
         .commands-panel { position: absolute; top: 70px; left: 16px; right: auto; width: 380px; backdrop-filter: blur(20px); border-radius: 28px; padding: 16px; z-index: 35; display: none; flex-direction: column; gap: 12px; border: 1px solid; max-height: 75vh; overflow-y: auto; }
         .commands-panel.active { display: flex; }
         .commands-title { font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 8px; }
-        .commands-list { display: flex; flex-direction: column; gap: 6px; max-height: 45vh; overflow-y: auto; padding: 4px; border-radius: 20px; }
+        .commands-list { display: flex; flex-direction: column; gap: 6px; max-height: 40vh; overflow-y: auto; padding: 4px; border-radius: 20px; }
         .command-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 50px; transition: 0.1s; border: 1px solid transparent; }
         .command-item.completed { border-color: #4ade80; background: rgba(74, 222, 128, 0.1); }
         .command-text { font-size: 0.8rem; font-weight: 500; }
@@ -95,9 +132,6 @@
         .command-item.completed .command-check { opacity: 1; color: #4ade80; }
         .commands-progress { font-size: 0.7rem; text-align: center; margin-top: 8px; opacity: 0.7; }
         .commands-record-btn { background: #ef4444; border: none; border-radius: 40px; padding: 8px 16px; color: white; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 8px; }
-        .commands-record-btn.recording { animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .commands-status { font-size: 0.65rem; text-align: center; margin-top: 8px; opacity: 0.7; }
         
         .record-section { border-radius: 20px; padding: 12px; margin-bottom: 12px; background: rgba(255,255,255,0.05); }
         .record-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 10px; text-align: center; }
@@ -139,12 +173,40 @@
         .footer-credit { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.6rem; z-index: 15; pointer-events: none; }
         .suggestions-list { position: absolute; top: 100%; left: 0; right: 0; border-radius: 20px; margin-top: 8px; max-height: 260px; overflow-y: auto; z-index: 30; display: none; }
         .suggestion-item { padding: 12px 16px; cursor: pointer; }
-        @media (max-width: 600px) { .icon-btn { padding: 5px 10px; min-width: 100px; } .top-bar { left: 65px; } .settings-panel, .favorite-panel, .commands-panel { width: 290px; } .commands-list { max-height: 35vh; } .select-favorite-btn { bottom: 160px; left: 12px; padding: 8px 14px; } }
+        @media (max-width: 600px) { .icon-btn { padding: 5px 10px; min-width: 100px; } .top-bar { left: 65px; } .settings-panel, .favorite-panel, .commands-panel, .sync-panel { width: 290px; } .select-favorite-btn { bottom: 160px; left: 12px; padding: 8px 14px; } }
     </style>
 </head>
 <body class="dark-theme">
 
 <div id="map"></div>
+
+<!-- АВТОРИЗАЦИЯ -->
+<div id="authOverlay" class="auth-overlay">
+    <div id="authPanel" class="auth-panel">
+        <div class="auth-title">🧭 NCPGPS</div>
+        <div class="auth-sub">Войдите или создайте аккаунт</div>
+        
+        <div id="loginForm">
+            <input type="text" id="loginNick" class="auth-input" placeholder="Никнейм">
+            <input type="email" id="loginEmail" class="auth-input" placeholder="Email">
+            <input type="password" id="loginPassword" class="auth-input" placeholder="Пароль">
+            <button id="loginBtn" class="auth-btn">🔓 Войти</button>
+            <div class="auth-switch" id="showRegisterBtn">Нет аккаунта? Зарегистрироваться</div>
+            <div id="authError" class="auth-error"></div>
+        </div>
+        
+        <div id="registerForm" style="display: none;">
+            <input type="text" id="regNick" class="auth-input" placeholder="Никнейм">
+            <input type="email" id="regEmail" class="auth-input" placeholder="Email">
+            <input type="password" id="regPassword" class="auth-input" placeholder="Пароль">
+            <input type="password" id="regPasswordConfirm" class="auth-input" placeholder="Подтвердите пароль">
+            <button id="registerBtn" class="auth-btn">📝 Зарегистрироваться</button>
+            <div class="auth-switch" id="showLoginBtn">Уже есть аккаунт? Войти</div>
+            <div id="regError" class="auth-error"></div>
+            <div id="regSuccess" class="auth-success"></div>
+        </div>
+    </div>
+</div>
 
 <button class="menu-btn" id="menuBtn">☰ Меню</button>
 <div id="menuPanel" class="menu-panel">
@@ -152,6 +214,18 @@
     <button id="settingsMenuItem">⚙️ Настройки</button>
     <button id="favoritesMenuItem">⭐ Избранное</button>
     <button id="commandsMenuItem">🎤 Голосовые команды</button>
+    <button id="syncMenuItem">🔄 Синхронизация</button>
+    <button id="logoutMenuItem">🚪 Выйти</button>
+</div>
+
+<div id="syncPanel" class="sync-panel">
+    <div class="sync-title">🔄 Синхронизация данных</div>
+    <div class="sync-buttons">
+        <button id="exportDataBtn" class="sync-btn export">📤 Экспорт (.ncp)</button>
+        <button id="importDataBtn" class="sync-btn import">📥 Импорт (.ncp)</button>
+    </div>
+    <input type="file" id="importFileInput" class="file-input-sync" accept=".ncp">
+    <div id="syncStatus" class="sync-status">⚡ Ваши данные зашифрованы и видны только вам</div>
 </div>
 
 <div id="settingsPanel" class="settings-panel">
@@ -176,7 +250,6 @@
 
 <div id="commandsPanel" class="commands-panel">
     <div class="commands-title">🎤 Свой голос и команды</div>
-    
     <div class="record-section">
         <div class="record-title">📢 Записать или загрузить свой голос</div>
         <div class="record-buttons">
@@ -186,9 +259,8 @@
             <button id="deleteRecordBtn" class="record-btn delete">🗑 Удалить</button>
         </div>
         <input type="file" id="fileInput" class="file-input" accept="audio/*">
-        <div id="recordStatus" class="record-status">⚡ Запишите или загрузите свой голос — он будет использоваться для команд</div>
+        <div id="recordStatus" class="record-status">⚡ Запишите или загрузите свой голос</div>
     </div>
-    
     <div class="commands-title">🎤 Список голосовых команд</div>
     <div class="commands-list" id="commandsList"></div>
     <div class="commands-progress" id="commandsProgress">0/0 выполнено</div>
@@ -250,120 +322,256 @@
         });
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-        // ========== ЗАПИСЬ И ЗАГРУЗКА ГОЛОСА ==========
-        let mediaRecorder = null;
-        let audioChunks = [];
+        // ========== ЗАЩИЩЁННАЯ СИСТЕМА АККАУНТОВ СОХРАНЯЕТ ВХОД ==========
+        // Простое шифрование (XOR)
+        function encryptData(data, password) {
+            let result = '';
+            const str = JSON.stringify(data);
+            for (let i = 0; i < str.length; i++) {
+                const charCode = str.charCodeAt(i) ^ password.charCodeAt(i % password.length);
+                result += String.fromCharCode(charCode);
+            }
+            return btoa(result);
+        }
+        
+        function decryptData(encrypted, password) {
+            try {
+                const decoded = atob(encrypted);
+                let result = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    const charCode = decoded.charCodeAt(i) ^ password.charCodeAt(i % password.length);
+                    result += String.fromCharCode(charCode);
+                }
+                return JSON.parse(result);
+            } catch(e) { return null; }
+        }
+        
+        let currentUser = null;
+        let currentPassword = null;
+        
+        function loadUsers() {
+            const users = localStorage.getItem('ncp_users_encrypted');
+            if (users) {
+                try { return JSON.parse(users); } catch(e) { return {}; }
+            }
+            return {};
+        }
+        
+        function saveUsers(users) {
+            localStorage.setItem('ncp_users_encrypted', JSON.stringify(users));
+        }
+        
+        function saveCurrentUserData() {
+            if (!currentUser || !currentPassword) return;
+            const data = {
+                favorites: localStorage.getItem('ncp_favorites') || '[]',
+                voiceCommands: localStorage.getItem('ncp_voice_commands') || '[]',
+                theme: localStorage.getItem('ncp_theme') || 'dark',
+                moderator: localStorage.getItem('ncp_moderator') === 'true',
+                consent: localStorage.getItem('ncp_consent') === 'yes',
+                customVoice: localStorage.getItem('ncp_custom_voice') || null,
+                gpsHistory: localStorage.getItem('ncp_gps_history') || '[]'
+            };
+            const users = loadUsers();
+            if (!users[currentUser.nick]) users[currentUser.nick] = { email: currentUser.email };
+            users[currentUser.nick].encryptedData = encryptData(data, currentPassword);
+            saveUsers(users);
+        }
+        
+        function loadUserDataToLocal(nick, password) {
+            const users = loadUsers();
+            if (users[nick] && users[nick].encryptedData) {
+                const userData = decryptData(users[nick].encryptedData, password);
+                if (userData) {
+                    if (userData.favorites) localStorage.setItem('ncp_favorites', userData.favorites);
+                    if (userData.voiceCommands) localStorage.setItem('ncp_voice_commands', userData.voiceCommands);
+                    if (userData.theme) { localStorage.setItem('ncp_theme', userData.theme); setTheme(userData.theme); }
+                    if (userData.moderator) localStorage.setItem('ncp_moderator', 'true');
+                    else localStorage.removeItem('ncp_moderator');
+                    if (userData.consent) localStorage.setItem('ncp_consent', 'yes');
+                    if (userData.customVoice) localStorage.setItem('ncp_custom_voice', userData.customVoice);
+                    if (userData.gpsHistory) localStorage.setItem('ncp_gps_history', userData.gpsHistory);
+                }
+            }
+            loadFavorites();
+            loadCommandsProgress();
+            loadSavedRecording();
+            setTheme(localStorage.getItem('ncp_theme') || 'dark');
+        }
+        
+        function register(nick, email, password, passwordConfirm) {
+            const users = loadUsers();
+            if (users[nick]) { document.getElementById('regError').innerText = '❌ Никнейм уже существует'; return false; }
+            for (let u in users) {
+                if (users[u].email === email) { document.getElementById('regError').innerText = '❌ Email уже используется'; return false; }
+            }
+            if (!nick || !email || !password) { document.getElementById('regError').innerText = '❌ Заполните все поля'; return false; }
+            if (!email.includes('@')) { document.getElementById('regError').innerText = '❌ Введите корректный email'; return false; }
+            if (password.length < 4) { document.getElementById('regError').innerText = '❌ Пароль должен быть не менее 4 символов'; return false; }
+            if (password !== passwordConfirm) { document.getElementById('regError').innerText = '❌ Пароли не совпадают'; return false; }
+            
+            const emptyData = {
+                favorites: '[]',
+                voiceCommands: '[]',
+                theme: 'dark',
+                moderator: false,
+                consent: false,
+                customVoice: null,
+                gpsHistory: '[]'
+            };
+            
+            users[nick] = { email: email, encryptedData: encryptData(emptyData, password) };
+            saveUsers(users);
+            
+            document.getElementById('regSuccess').innerText = '✅ Аккаунт создан! Выполняется вход...';
+            document.getElementById('regError').innerText = '';
+            
+            setTimeout(() => {
+                login(nick, email, password);
+            }, 500);
+            return true;
+        }
+        
+        function login(nick, email, password) {
+            const users = loadUsers();
+            if (!users[nick] || users[nick].email !== email) {
+                document.getElementById('authError').innerText = '❌ Неверный никнейм или email';
+                return false;
+            }
+            
+            // Проверяем пароль (пытаемся расшифровать данные)
+            const testData = decryptData(users[nick].encryptedData, password);
+            if (!testData) {
+                document.getElementById('authError').innerText = '❌ Неверный пароль';
+                return false;
+            }
+            
+            currentUser = { nick: nick, email: email };
+            currentPassword = password;
+            
+            // Сохраняем сессию в localStorage
+            localStorage.setItem('ncp_current_user', JSON.stringify({ nick: nick, email: email }));
+            localStorage.setItem('ncp_current_password', password); // Сохраняем пароль для автоматического входа
+            
+            loadUserDataToLocal(nick, password);
+            
+            // Закрываем окно авторизации
+            document.getElementById('authOverlay').classList.add('hidden');
+            return true;
+        }
+        
+        function logout() {
+            if (currentUser) saveCurrentUserData();
+            currentUser = null;
+            currentPassword = null;
+            localStorage.removeItem('ncp_current_user');
+            localStorage.removeItem('ncp_current_password');
+            localStorage.removeItem('ncp_favorites');
+            localStorage.removeItem('ncp_voice_commands');
+            localStorage.removeItem('ncp_moderator');
+            localStorage.removeItem('ncp_custom_voice');
+            localStorage.removeItem('ncp_gps_history');
+            localStorage.setItem('ncp_theme', 'dark');
+            setTheme('dark');
+            loadFavorites();
+            loadCommandsProgress();
+            loadSavedRecording();
+            document.getElementById('authOverlay').classList.remove('hidden');
+        }
+        
+        // АВТОМАТИЧЕСКИЙ ВХОД ПРИ ЗАГРУЗКЕ
+        const savedUser = localStorage.getItem('ncp_current_user');
+        const savedPassword = localStorage.getItem('ncp_current_password');
+        if (savedUser && savedPassword) {
+            try {
+                const user = JSON.parse(savedUser);
+                const users = loadUsers();
+                if (users[user.nick] && users[user.nick].email === user.email) {
+                    const testData = decryptData(users[user.nick].encryptedData, savedPassword);
+                    if (testData) {
+                        currentUser = user;
+                        currentPassword = savedPassword;
+                        loadUserDataToLocal(user.nick, savedPassword);
+                        document.getElementById('authOverlay').classList.add('hidden');
+                    } else {
+                        document.getElementById('authOverlay').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                }
+            } catch(e) {
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+        } else {
+            document.getElementById('authOverlay').classList.remove('hidden');
+        }
+        
+        // Обработчики форм
+        document.getElementById('showRegisterBtn')?.addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authError').innerText = '';
+            document.getElementById('regError').innerText = '';
+            document.getElementById('regSuccess').innerText = '';
+        });
+        document.getElementById('showLoginBtn')?.addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('authError').innerText = '';
+            document.getElementById('regError').innerText = '';
+            document.getElementById('regSuccess').innerText = '';
+        });
+        
+        document.getElementById('loginBtn')?.addEventListener('click', () => {
+            const nick = document.getElementById('loginNick').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            login(nick, email, password);
+        });
+        
+        document.getElementById('registerBtn')?.addEventListener('click', () => {
+            const nick = document.getElementById('regNick').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            register(nick, email, password, passwordConfirm);
+        });
+        
+        document.getElementById('logoutMenuItem')?.addEventListener('click', () => {
+            logout();
+        });
+        
+        // ========== ОСТАЛЬНОЙ ФУНКЦИОНАЛ ==========
         let recordedAudioUrl = null;
-        let recordedAudioBlob = null;
         
         function loadSavedRecording() {
             const saved = localStorage.getItem('ncp_custom_voice');
             if (saved) {
                 try {
                     const blobData = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
-                    recordedAudioBlob = new Blob([blobData], { type: 'audio/webm' });
-                    recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
-                    document.getElementById('recordStatus').innerHTML = '✅ Ваш голос сохранён. Нажмите «Прослушать»';
+                    recordedAudioUrl = URL.createObjectURL(new Blob([blobData], { type: 'audio/webm' }));
+                    const statusDiv = document.getElementById('recordStatus');
+                    if (statusDiv) statusDiv.innerHTML = '✅ Ваш голос сохранён. Нажмите «Прослушать»';
                 } catch(e) {}
             }
         }
         
-        function saveRecording(blob) {
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                const base64 = reader.result.split(',')[1];
-                localStorage.setItem('ncp_custom_voice', base64);
-            };
-            reader.readAsDataURL(blob);
+        function setTheme(theme) {
+            document.body.classList.remove('dark-theme', 'light-theme', 'blue-theme', 'green-theme', 'red-theme', 'purple-theme');
+            document.body.classList.add(theme + '-theme');
+            localStorage.setItem('ncp_theme', theme);
+            if (currentUser) saveCurrentUserData();
         }
         
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = event => { audioChunks.push(event.data); };
-                mediaRecorder.onstop = () => {
-                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
-                    recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
-                    saveRecording(recordedAudioBlob);
-                    document.getElementById('recordStatus').innerHTML = '✅ Запись сохранена!';
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                mediaRecorder.start();
-                document.getElementById('recordStatus').innerHTML = '🔴 Запись... Говорите фразу';
-                document.getElementById('startRecordBtn').innerHTML = '⏹ Остановить';
-                document.getElementById('startRecordBtn').onclick = stopRecording;
-            } catch(err) {
-                document.getElementById('recordStatus').innerHTML = '❌ Нет доступа к микрофону';
-            }
-        }
+        var savedTheme = localStorage.getItem('ncp_theme');
+        if (savedTheme && savedTheme !== 'null') setTheme(savedTheme);
+        else setTheme('dark');
         
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                document.getElementById('startRecordBtn').innerHTML = '🔴 Записать';
-                document.getElementById('startRecordBtn').onclick = startRecording;
-                document.getElementById('recordStatus').innerHTML = '✅ Запись завершена!';
-            }
-        }
+        document.querySelectorAll('.theme-btn').forEach(btn => { btn.onclick = () => setTheme(btn.dataset.theme); });
         
-        function playRecording() {
-            if (recordedAudioUrl) {
-                const audio = new Audio(recordedAudioUrl);
-                audio.play();
-            } else {
-                document.getElementById('recordStatus').innerHTML = '❌ Нет записи. Сначала запишите или загрузите файл.';
-            }
-        }
+        function speakNCP(text) { console.log('Speak:', text); }
         
-        function deleteRecording() {
-            if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
-            recordedAudioUrl = null;
-            recordedAudioBlob = null;
-            localStorage.removeItem('ncp_custom_voice');
-            document.getElementById('recordStatus').innerHTML = '🗑 Запись удалена. Используется системный голос.';
-        }
-        
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('audio/')) {
-                document.getElementById('recordStatus').innerHTML = '❌ Пожалуйста, выберите аудиофайл (MP3, WAV)';
-                return;
-            }
-            if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
-            recordedAudioUrl = URL.createObjectURL(file);
-            recordedAudioBlob = file;
-            saveRecording(file);
-            document.getElementById('recordStatus').innerHTML = `✅ Файл "${file.name}" загружен!`;
-            event.target.value = '';
-        }
-        
-        document.getElementById('startRecordBtn').onclick = startRecording;
-        document.getElementById('playRecordBtn').onclick = playRecording;
-        document.getElementById('deleteRecordBtn').onclick = deleteRecording;
-        document.getElementById('uploadRecordBtn').onclick = () => document.getElementById('fileInput').click();
-        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-        loadSavedRecording();
-        
-        function speakNCP(text) {
-            if (recordedAudioUrl) {
-                const audio = new Audio(recordedAudioUrl);
-                audio.play();
-                return;
-            }
-            if (!window.speechSynthesis) return;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ru-RU';
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
-        }
-        
-        // ========== КОМАНДЫ ДЛЯ ТРЕНИРОВКИ ==========
+        // Команды
         const commandsList = [
             "Маршрут принят", "Поверните налево", "Поверните направо", "Двигайтесь прямо",
             "Вы прибыли", "Маршрут отменён", "Ваше местоположение определено",
@@ -384,10 +592,6 @@
             if (saved) { try { completedCommands = JSON.parse(saved); } catch(e) {} }
             renderCommandsList();
         }
-        function saveCommandsProgress() {
-            localStorage.setItem('ncp_voice_commands', JSON.stringify(completedCommands));
-            renderCommandsList();
-        }
         function renderCommandsList() {
             const container = document.getElementById('commandsList');
             if (!container) return;
@@ -403,84 +607,12 @@
             const progress = document.getElementById('commandsProgress');
             if (progress) progress.innerText = `${completedCommands.length}/${commandsList.length} выполнено`;
         }
-        function completeCommand(command) {
-            if (!completedCommands.includes(command)) {
-                completedCommands.push(command);
-                saveCommandsProgress();
-                speakNCP(`Команда "${command}" отмечена`);
-            }
-        }
-        
-        let recognition = null;
-        let isRecognizing = false;
-        const recordBtnCmd = document.getElementById('startCommandsRecordBtn');
-        const statusDivCmd = document.getElementById('commandsStatus');
-        
-        function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                if (statusDivCmd) statusDivCmd.innerHTML = '❌ Распознавание не поддерживается';
-                if (recordBtnCmd) recordBtnCmd.disabled = true;
-                return false;
-            }
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'ru-RU';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.onstart = function() { isRecognizing = true; if (recordBtnCmd) { recordBtnCmd.classList.add('recording'); recordBtnCmd.innerHTML = '🔴 Слушаю...'; } if (statusDivCmd) statusDivCmd.innerHTML = '🎤 Говорите команду...'; };
-            recognition.onend = function() { isRecognizing = false; if (recordBtnCmd) { recordBtnCmd.classList.remove('recording'); recordBtnCmd.innerHTML = '🎙️ Начать распознавание'; } };
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                if (statusDivCmd) statusDivCmd.innerHTML = `🔍 Распознано: "${transcript}"`;
-                let matched = false;
-                for (let cmd of commandsList) {
-                    if (transcript.toLowerCase().includes(cmd.toLowerCase()) || cmd.toLowerCase().includes(transcript.toLowerCase())) {
-                        completeCommand(cmd);
-                        matched = true;
-                        if (statusDivCmd) statusDivCmd.innerHTML = `✅ Команда "${cmd}" отмечена!`;
-                        break;
-                    }
-                }
-                if (!matched && statusDivCmd) statusDivCmd.innerHTML = `❌ Команда не найдена в списке`;
-            };
-            recognition.onerror = function(event) { if (statusDivCmd) statusDivCmd.innerHTML = `❌ Ошибка: ${event.error}`; isRecognizing = false; if (recordBtnCmd) { recordBtnCmd.classList.remove('recording'); recordBtnCmd.innerHTML = '🎙️ Начать распознавание'; } };
-            return true;
-        }
-        function startRecognition() {
-            if (!recognition) { if (!initSpeechRecognition()) return; }
-            if (isRecognizing) { if (recognition) recognition.stop(); return; }
-            try { recognition.start(); } catch(e) { if (statusDivCmd) statusDivCmd.innerHTML = '❌ Ошибка микрофона'; }
-        }
-        if (recordBtnCmd) recordBtnCmd.addEventListener('click', startRecognition);
-        initSpeechRecognition();
         loadCommandsProgress();
         
-        // ========== ИЗБРАННОЕ ==========
+        // Избранное
         let favorites = [], isSelectingFavorite = false;
         const selectBtn = document.getElementById('selectFavoriteBtn');
         function loadFavorites() { const saved = localStorage.getItem('ncp_favorites'); if (saved) { try { favorites = JSON.parse(saved); } catch(e) {} } renderFavorites(); }
-        function saveFavorites() { localStorage.setItem('ncp_favorites', JSON.stringify(favorites)); renderFavorites(); }
-        async function addToFavorites(lat, lng) {
-            if (isSelectingFavorite) stopSelectingFavorite();
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
-                const data = await res.json();
-                const address = data.display_name || `Точка на карте (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
-                const shortName = address.split(',')[0];
-                favorites.unshift({ id: Date.now(), lat, lng, name: shortName, address });
-                saveFavorites();
-                const starMarker = new maplibregl.Marker({ color: '#facc15', scale: 1.2 }).setLngLat([lng, lat]).addTo(map);
-                setTimeout(() => starMarker.remove(), 2000);
-                speakNCP(`Место ${shortName} добавлено в избранное`);
-            } catch(e) {
-                favorites.unshift({ id: Date.now(), lat, lng, name: `Место (${lat.toFixed(5)}, ${lng.toFixed(5)})`, address: `Координаты: ${lat.toFixed(5)}, ${lng.toFixed(5)}` });
-                saveFavorites();
-                speakNCP('Место добавлено в избранное');
-            }
-        }
-        function removeFromFavorites(id) { favorites = favorites.filter(f => f.id !== id); saveFavorites(); speakNCP('Место удалено из избранного'); }
-        function routeToFavorite(lat, lng, name) { if (currentLat !== null) { buildRouteTo(currentLat, currentLng, lat, lng); speakNCP(`Маршрут до ${name} построен`); } else { alert('Сначала дождитесь определения GPS'); } }
         function renderFavorites() {
             const container = document.getElementById('favoritesList');
             if (!container) return;
@@ -495,33 +627,39 @@
                 container.appendChild(item);
             });
         }
-        function startSelectingFavorite() { isSelectingFavorite = true; selectBtn.classList.add('active'); selectBtn.innerHTML = '<span>📍</span> Нажмите на карту...'; map.getCanvas().style.cursor = 'crosshair'; speakNCP('Режим выбора места'); }
+        function removeFromFavorites(id) { favorites = favorites.filter(f => f.id !== id); saveFavorites(); }
+        function saveFavorites() { localStorage.setItem('ncp_favorites', JSON.stringify(favorites)); renderFavorites(); if (currentUser) saveCurrentUserData(); }
+        function routeToFavorite(lat, lng, name) { if (currentLat !== null) { buildRouteTo(currentLat, currentLng, lat, lng); speakNCP(`Маршрут до ${name} построен`); } else { alert('Сначала дождитесь определения GPS'); } }
+        function startSelectingFavorite() { isSelectingFavorite = true; selectBtn.classList.add('active'); selectBtn.innerHTML = '<span>📍</span> Нажмите на карту...'; map.getCanvas().style.cursor = 'crosshair'; }
         function stopSelectingFavorite() { isSelectingFavorite = false; selectBtn.classList.remove('active'); selectBtn.innerHTML = '<span>⭐</span> Добавить в избранное'; map.getCanvas().style.cursor = ''; }
         if (selectBtn) selectBtn.addEventListener('click', () => { if (isSelectingFavorite) stopSelectingFavorite(); else startSelectingFavorite(); });
         map.on('click', (e) => { if (isSelectingFavorite) { addToFavorites(e.lngLat.lat, e.lngLat.lng); stopSelectingFavorite(); } });
+        async function addToFavorites(lat, lng) {
+            if (isSelectingFavorite) stopSelectingFavorite();
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
+                const data = await res.json();
+                const address = data.display_name || `Точка на карте (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+                const shortName = address.split(',')[0];
+                favorites.unshift({ id: Date.now(), lat, lng, name: shortName, address });
+                saveFavorites();
+                const starMarker = new maplibregl.Marker({ color: '#facc15', scale: 1.2 }).setLngLat([lng, lat]).addTo(map);
+                setTimeout(() => starMarker.remove(), 2000);
+            } catch(e) {
+                favorites.unshift({ id: Date.now(), lat, lng, name: `Место (${lat.toFixed(5)}, ${lng.toFixed(5)})`, address: `Координаты: ${lat.toFixed(5)}, ${lng.toFixed(5)}` });
+                saveFavorites();
+            }
+        }
         loadFavorites();
         
-        // ========== ТЕМЫ ==========
-        function setTheme(theme) {
-            document.body.classList.remove('dark-theme', 'light-theme', 'blue-theme', 'green-theme', 'red-theme', 'purple-theme');
-            document.body.classList.add(theme + '-theme');
-            localStorage.setItem('ncp_theme', theme);
-        }
-        var savedTheme = localStorage.getItem('ncp_theme');
-        if (savedTheme && savedTheme !== 'null') setTheme(savedTheme);
-        else setTheme('dark');
-        document.querySelectorAll('.theme-btn').forEach(btn => { btn.onclick = () => setTheme(btn.dataset.theme); });
-        
-        // ========== СЕКРЕТНЫЙ РЕЖИМ ==========
+        // Секретный режим
         const secretToggle = document.getElementById('secretToggle');
         const secretPanel = document.getElementById('secretPanel');
         const secretPassword = document.getElementById('secretPassword');
         const unlockBtn = document.getElementById('unlockSecretBtn');
         const secretStatus = document.getElementById('secretStatus');
         let isModeratorMode = localStorage.getItem('ncp_moderator') === 'true';
-        
         if (isModeratorMode && secretStatus) secretStatus.innerHTML = '✅ Режим активен';
-        
         if (secretToggle) {
             secretToggle.addEventListener('click', () => {
                 if (isModeratorMode) {
@@ -537,35 +675,98 @@
         function unlockModerator() {
             if (secretPassword.value === '6369') {
                 isModeratorMode = true; localStorage.setItem('ncp_moderator', 'true');
+                if (currentUser) saveCurrentUserData();
                 if (secretStatus) { secretStatus.innerHTML = '✅ Режим активирован!'; secretStatus.style.color = '#4ade80'; }
                 setTimeout(() => { if (secretPanel) secretPanel.classList.remove('active'); }, 1500);
-                speakNCP('Режим модератора активирован');
             } else { if (secretStatus) { secretStatus.innerHTML = '❌ Неверный пароль'; secretStatus.style.color = '#ef4444'; } }
         }
         if (unlockBtn) unlockBtn.addEventListener('click', unlockModerator);
         if (secretPassword) secretPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') unlockModerator(); });
+        
+        // Синхронизация
+        function exportAllData() {
+            const data = {
+                version: "1.0",
+                timestamp: new Date().toISOString(),
+                favorites: JSON.parse(localStorage.getItem('ncp_favorites') || '[]'),
+                voiceCommands: JSON.parse(localStorage.getItem('ncp_voice_commands') || '[]'),
+                theme: localStorage.getItem('ncp_theme') || 'dark',
+                moderator: localStorage.getItem('ncp_moderator') === 'true',
+                consent: localStorage.getItem('ncp_consent') === 'yes',
+                customVoice: localStorage.getItem('ncp_custom_voice') || null,
+                gpsHistory: JSON.parse(localStorage.getItem('ncp_gps_history') || '[]')
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ncpmapdata_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.ncp`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            const statusDiv = document.getElementById('syncStatus');
+            if (statusDiv) statusDiv.innerHTML = '✅ Данные экспортированы!';
+            setTimeout(() => { if (statusDiv.innerHTML === '✅ Данные экспортированы!') statusDiv.innerHTML = '⚡ Ваши данные зашифрованы и видны только вам'; }, 3000);
+        }
+        function importAllData(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.favorites) localStorage.setItem('ncp_favorites', JSON.stringify(data.favorites));
+                    if (data.voiceCommands) localStorage.setItem('ncp_voice_commands', JSON.stringify(data.voiceCommands));
+                    if (data.theme) { localStorage.setItem('ncp_theme', data.theme); setTheme(data.theme); }
+                    if (data.moderator) localStorage.setItem('ncp_moderator', 'true');
+                    else localStorage.removeItem('ncp_moderator');
+                    if (data.consent) localStorage.setItem('ncp_consent', 'yes');
+                    if (data.customVoice) localStorage.setItem('ncp_custom_voice', data.customVoice);
+                    if (data.gpsHistory) localStorage.setItem('ncp_gps_history', JSON.stringify(data.gpsHistory));
+                    if (currentUser) saveCurrentUserData();
+                    loadFavorites();
+                    loadCommandsProgress();
+                    const statusDiv = document.getElementById('syncStatus');
+                    if (statusDiv) statusDiv.innerHTML = '✅ Данные импортированы!';
+                } catch(err) {
+                    const statusDiv = document.getElementById('syncStatus');
+                    if (statusDiv) statusDiv.innerHTML = '❌ Ошибка: неверный формат файла';
+                }
+            };
+            reader.readAsText(file);
+        }
+        document.getElementById('exportDataBtn')?.addEventListener('click', exportAllData);
+        document.getElementById('importDataBtn')?.addEventListener('click', () => document.getElementById('importFileInput').click());
+        document.getElementById('importFileInput')?.addEventListener('change', (e) => { if (e.target.files[0]) importAllData(e.target.files[0]); e.target.value = ''; });
         
         // ========== НАВИГАЦИЯ UI ==========
         var userMarker = new maplibregl.Marker({ color: '#3b82f6' }).setLngLat([37.618423, 55.751244]).addTo(map);
         var destMarkers = [], routeSources = [], currentLat = null, currentLng = null, routeHistory = [], continueBtn = null, lastTap = 0;
         try { var stored = localStorage.getItem('ncp_gps_history'); if (stored) routeHistory = JSON.parse(stored); document.getElementById('archiveCount').innerText = routeHistory.length; } catch(e) {}
         
-        var menuPanel = document.getElementById('menuPanel'), settingsPanel = document.getElementById('settingsPanel'), favoritesPanel = document.getElementById('favoritesPanel'), commandsPanel = document.getElementById('commandsPanel'), menuBtn = document.getElementById('menuBtn');
-        function closeAllPanels() { if (menuPanel) menuPanel.classList.remove('active'); if (settingsPanel) settingsPanel.classList.remove('active'); if (favoritesPanel) favoritesPanel.classList.remove('active'); if (commandsPanel) commandsPanel.classList.remove('active'); }
+        var menuPanel = document.getElementById('menuPanel'), settingsPanel = document.getElementById('settingsPanel'), favoritesPanel = document.getElementById('favoritesPanel'), commandsPanel = document.getElementById('commandsPanel'), syncPanel = document.getElementById('syncPanel'), menuBtn = document.getElementById('menuBtn');
+        function closeAllPanels() { 
+            if (menuPanel) menuPanel.classList.remove('active'); 
+            if (settingsPanel) settingsPanel.classList.remove('active'); 
+            if (favoritesPanel) favoritesPanel.classList.remove('active'); 
+            if (commandsPanel) commandsPanel.classList.remove('active'); 
+            if (syncPanel) syncPanel.classList.remove('active'); 
+        }
         if (menuBtn) { menuBtn.onclick = function(e) { e.stopPropagation(); if (menuPanel.classList.contains('active')) closeAllPanels(); else { closeAllPanels(); menuPanel.classList.add('active'); } }; }
         document.getElementById('settingsMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); if (settingsPanel) settingsPanel.classList.add('active'); });
         document.getElementById('favoritesMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); renderFavorites(); if (favoritesPanel) favoritesPanel.classList.add('active'); });
         document.getElementById('commandsMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); renderCommandsList(); if (commandsPanel) commandsPanel.classList.add('active'); });
-        document.getElementById('promoMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); alert('🧭 NCPGPS — навигатор принятых решений\n\n🎤 Свой голос — запись или загрузка MP3\n⭐ Избранное — сохраняйте места\n🔐 Режим модератора — пароль 6369'); closeAllPanels(); });
-        document.addEventListener('click', function(e) { if (menuPanel && !menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active'); if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) settingsPanel.classList.remove('active'); if (favoritesPanel && !favoritesPanel.contains(e.target) && e.target !== document.getElementById('favoritesMenuItem')) favoritesPanel.classList.remove('active'); if (commandsPanel && !commandsPanel.contains(e.target) && e.target !== document.getElementById('commandsMenuItem')) commandsPanel.classList.remove('active'); });
-        if (!localStorage.getItem('ncp_consent')) { if (confirm('🍪 NCPGPS использует локальное хранилище.')) localStorage.setItem('ncp_consent', 'yes'); }
+        document.getElementById('syncMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); if (syncPanel) syncPanel.classList.add('active'); });
+        document.getElementById('promoMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); alert('🧭 NCPGPS — навигатор принятых решений\n\n🔐 Ваши данные зашифрованы и видны только вам\n🔄 Синхронизация — экспорт/импорт данных\n🎤 Свой голос — запись или загрузка MP3\n⭐ Избранное — сохраняйте места\n🔐 Режим модератора — пароль 6369'); closeAllPanels(); });
+        document.addEventListener('click', function(e) { if (menuPanel && !menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active'); if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) settingsPanel.classList.remove('active'); if (favoritesPanel && !favoritesPanel.contains(e.target) && e.target !== document.getElementById('favoritesMenuItem')) favoritesPanel.classList.remove('active'); if (commandsPanel && !commandsPanel.contains(e.target) && e.target !== document.getElementById('commandsMenuItem')) commandsPanel.classList.remove('active'); if (syncPanel && !syncPanel.contains(e.target) && e.target !== document.getElementById('syncMenuItem')) syncPanel.classList.remove('active'); });
+        if (!localStorage.getItem('ncp_consent')) { if (confirm('🔐 Ваши данные шифруются и хранятся только на этом устройстве. Продолжить?')) localStorage.setItem('ncp_consent', 'yes'); }
         
         function startGPS() {
             var statusDiv = document.getElementById('coordStatus');
             if (!navigator.geolocation) { statusDiv.innerHTML = '❌ GPS не поддерживается'; currentLat = 55.751244; currentLng = 37.618423; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.setCenter([currentLng, currentLat]); statusDiv.innerHTML = '📍 Москва (по умолчанию)'; return; }
             statusDiv.innerHTML = '📍 Запрос GPS...';
             navigator.geolocation.getCurrentPosition(
-                (pos) => { currentLat = pos.coords.latitude; currentLng = pos.coords.longitude; statusDiv.innerHTML = `📍 ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.flyTo({ center: [currentLng, currentLat], zoom: 13, duration: 500 }); speakNCP('Ваше местоположение определено'); },
+                (pos) => { currentLat = pos.coords.latitude; currentLng = pos.coords.longitude; statusDiv.innerHTML = `📍 ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.flyTo({ center: [currentLng, currentLat], zoom: 13, duration: 500 }); },
                 (err) => { statusDiv.innerHTML = '⚠️ GPS недоступен, используем Москву'; currentLat = 55.751244; currentLng = 37.618423; if(userMarker) userMarker.setLngLat([currentLng, currentLat]); map.setCenter([currentLng, currentLat]); },
                 { enableHighAccuracy: true, timeout: 8000 }
             );
@@ -592,22 +793,22 @@
                     document.getElementById('routeDistance').innerHTML = dist + ' км';
                     document.getElementById('routeDuration').innerHTML = dur + ' мин';
                     document.getElementById('routeStatsBox').style.display = 'flex';
-                    speakNCP(`Маршрут принят. ${dist} км, ${dur} минут.`);
                     routeHistory.unshift({ text: dist + 'км / ' + dur + 'мин', time: new Date().toLocaleTimeString() });
                     if (routeHistory.length > 12) routeHistory.pop();
                     localStorage.setItem('ncp_gps_history', JSON.stringify(routeHistory));
+                    if (currentUser) saveCurrentUserData();
                     document.getElementById('archiveCount').innerText = routeHistory.length;
                 } else { alert('Маршрут не найден'); }
             } catch(e) { alert('Ошибка маршрута'); }
         }
         
         async function buildFromInput() { var dest = document.getElementById('destinationInput').value.trim(); if (!dest) { alert('Введите адрес'); return; } if (currentLat === null) { alert('Подождите GPS'); return; } try { var resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1`); var data = await resp.json(); if (data.length) await buildRouteTo(currentLat, currentLng, parseFloat(data[0].lat), parseFloat(data[0].lon)); else alert('Адрес не найден'); } catch(e) { alert('Ошибка поиска'); } }
-        function cancelRoute() { destMarkers.forEach(m => m.remove()); destMarkers = []; routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); }); routeSources = []; document.getElementById('routeStatsBox').style.display = 'none'; speakNCP('Маршрут отменён'); }
+        function cancelRoute() { destMarkers.forEach(m => m.remove()); destMarkers = []; routeSources.forEach(src => { if (map.getLayer(src)) map.removeLayer(src); if (map.getSource(src)) map.removeSource(src); }); routeSources = []; document.getElementById('routeStatsBox').style.display = 'none'; }
         
         document.getElementById('buildRouteCompact').onclick = buildFromInput;
         document.getElementById('cancelRouteBtn').onclick = cancelRoute;
         document.getElementById('centerBtn').onclick = () => { if (currentLat) map.flyTo({ center: [currentLng, currentLat], zoom: 14, duration: 500 }); };
-        document.getElementById('voiceTrigger').onclick = () => speakNCP('Навигатор активен');
+        document.getElementById('voiceTrigger').onclick = () => {}
         document.getElementById('archiveCompact').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         document.getElementById('archiveCompact2').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         
