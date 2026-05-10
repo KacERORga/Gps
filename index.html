@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCPGPS — Достижения в профиле</title>
+    <title>NCPGPS — Профиль и достижения</title>
     <link href="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.0/dist/maplibre-gl.js"></script>
     <style>
@@ -13,37 +13,31 @@
         body.dark-theme { background: #0a0f1a; }
         body.dark-theme .icon-btn, body.dark-theme .search-container, body.dark-theme .bottom-sheet,
         body.dark-theme .menu-btn, body.dark-theme .menu-panel, body.dark-theme .settings-panel,
-        body.dark-theme .favorite-panel, body.dark-theme .commands-panel, body.dark-theme .sync-panel,
-        body.dark-theme .profile-panel {
+        body.dark-theme .favorite-panel, body.dark-theme .sync-panel, body.dark-theme .profile-panel {
             background: rgba(20, 24, 35, 0.95); color: #e2e8f0; border-color: rgba(255,255,255,0.15);
         }
         body.light-theme { background: #f1f5f9; }
         body.light-theme .icon-btn, body.light-theme .search-container, body.light-theme .bottom-sheet,
         body.light-theme .menu-btn, body.light-theme .menu-panel, body.light-theme .settings-panel,
-        body.light-theme .favorite-panel, body.light-theme .commands-panel, body.light-theme .sync-panel,
-        body.light-theme .profile-panel {
+        body.light-theme .favorite-panel, body.light-theme .sync-panel, body.light-theme .profile-panel {
             background: rgba(255,255,255,0.95); color: #0f172a; border-color: #cbd5e1;
         }
         body.blue-theme { background: #0c2d4a; }
         body.blue-theme .icon-btn, body.blue-theme .search-container, body.blue-theme .bottom-sheet,
         body.blue-theme .menu-btn, body.blue-theme .menu-panel, body.blue-theme .settings-panel,
-        body.blue-theme .favorite-panel, body.blue-theme .commands-panel, body.blue-theme .sync-panel,
-        body.blue-theme .profile-panel { background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5; }
+        body.blue-theme .favorite-panel, body.blue-theme .sync-panel, body.blue-theme .profile-panel { background: rgba(12, 45, 74, 0.95); color: #bae6fd; border-color: #1e88e5; }
         body.green-theme { background: #0a2e1a; }
         body.green-theme .icon-btn, body.green-theme .search-container, body.green-theme .bottom-sheet,
         body.green-theme .menu-btn, body.green-theme .menu-panel, body.green-theme .settings-panel,
-        body.green-theme .favorite-panel, body.green-theme .commands-panel, body.green-theme .sync-panel,
-        body.green-theme .profile-panel { background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e; }
+        body.green-theme .favorite-panel, body.green-theme .sync-panel, body.green-theme .profile-panel { background: rgba(10, 46, 26, 0.95); color: #bbf7d0; border-color: #22c55e; }
         body.red-theme { background: #3b0a0a; }
         body.red-theme .icon-btn, body.red-theme .search-container, body.red-theme .bottom-sheet,
         body.red-theme .menu-btn, body.red-theme .menu-panel, body.red-theme .settings-panel,
-        body.red-theme .favorite-panel, body.red-theme .commands-panel, body.red-theme .sync-panel,
-        body.red-theme .profile-panel { background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444; }
+        body.red-theme .favorite-panel, body.red-theme .sync-panel, body.red-theme .profile-panel { background: rgba(59, 10, 10, 0.95); color: #fecaca; border-color: #ef4444; }
         body.purple-theme { background: #1a0a3b; }
         body.purple-theme .icon-btn, body.purple-theme .search-container, body.purple-theme .bottom-sheet,
         body.purple-theme .menu-btn, body.purple-theme .menu-panel, body.purple-theme .settings-panel,
-        body.purple-theme .favorite-panel, body.purple-theme .commands-panel, body.purple-theme .sync-panel,
-        body.purple-theme .profile-panel { background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7; }
+        body.purple-theme .favorite-panel, body.purple-theme .sync-panel, body.purple-theme .profile-panel { background: rgba(26, 10, 59, 0.95); color: #e9d5ff; border-color: #a855f7; }
         
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #1a2a3a; }
         
@@ -83,7 +77,7 @@
         .auth-error { font-size: 0.7rem; color: #ef4444; margin-top: 8px; }
         .auth-success { font-size: 0.7rem; color: #4ade80; margin-top: 8px; }
         
-        /* Панель профиля с достижениями */
+        /* Панель профиля */
         .profile-panel {
             position: absolute;
             top: 70px;
@@ -167,28 +161,6 @@
         .settings-panel { position: absolute; bottom: 140px; left: 16px; right: auto; width: 300px; backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; z-index: 35; display: none; flex-direction: column; gap: 20px; border: 1px solid; max-height: 70vh; overflow-y: auto; }
         .settings-panel.active { display: flex; }
         
-        .commands-panel { position: absolute; top: 70px; left: 16px; right: auto; width: 380px; backdrop-filter: blur(20px); border-radius: 28px; padding: 16px; z-index: 35; display: none; flex-direction: column; gap: 12px; border: 1px solid; max-height: 75vh; overflow-y: auto; }
-        .commands-panel.active { display: flex; }
-        .commands-title { font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 8px; }
-        .commands-list { display: flex; flex-direction: column; gap: 6px; max-height: 40vh; overflow-y: auto; padding: 4px; border-radius: 20px; }
-        .command-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 50px; transition: 0.1s; border: 1px solid transparent; }
-        .command-item.completed { border-color: #4ade80; background: rgba(74, 222, 128, 0.1); }
-        .command-text { font-size: 0.8rem; font-weight: 500; }
-        .command-check { font-size: 1.1rem; opacity: 0.5; }
-        .command-item.completed .command-check { opacity: 1; color: #4ade80; }
-        .commands-progress { font-size: 0.7rem; text-align: center; margin-top: 8px; opacity: 0.7; }
-        .commands-record-btn { background: #ef4444; border: none; border-radius: 40px; padding: 8px 16px; color: white; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 8px; }
-        
-        .record-section { border-radius: 20px; padding: 12px; margin-bottom: 12px; background: rgba(255,255,255,0.05); }
-        .record-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 10px; text-align: center; }
-        .record-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .record-btn { background: #ef4444; border: none; border-radius: 40px; padding: 8px 16px; color: white; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .record-btn.play { background: #2c6e9e; }
-        .record-btn.delete { background: #475569; }
-        .record-btn.upload { background: #facc15; color: #0f172a; }
-        .record-status { font-size: 0.65rem; text-align: center; margin-top: 8px; opacity: 0.7; }
-        .file-input { display: none; }
-        
         .favorite-panel { position: absolute; top: 70px; left: 16px; right: auto; width: 320px; backdrop-filter: blur(20px); border-radius: 28px; padding: 16px; z-index: 35; display: none; flex-direction: column; gap: 12px; border: 1px solid; max-height: 70vh; overflow-y: auto; }
         .favorite-panel.active { display: flex; }
         .favorite-title { font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 8px; }
@@ -219,7 +191,7 @@
         .footer-credit { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.6rem; z-index: 15; pointer-events: none; }
         .suggestions-list { position: absolute; top: 100%; left: 0; right: 0; border-radius: 20px; margin-top: 8px; max-height: 260px; overflow-y: auto; z-index: 30; display: none; }
         .suggestion-item { padding: 12px 16px; cursor: pointer; }
-        @media (max-width: 600px) { .icon-btn { padding: 5px 10px; min-width: 100px; } .top-bar { left: 65px; } .settings-panel, .favorite-panel, .commands-panel, .sync-panel, .profile-panel { width: 290px; } .select-favorite-btn { bottom: 160px; left: 12px; padding: 8px 14px; } }
+        @media (max-width: 600px) { .icon-btn { padding: 5px 10px; min-width: 100px; } .top-bar { left: 65px; } .settings-panel, .favorite-panel, .sync-panel, .profile-panel { width: 290px; } .select-favorite-btn { bottom: 160px; left: 12px; padding: 8px 14px; } }
     </style>
 </head>
 <body class="dark-theme">
@@ -258,7 +230,6 @@
     <button id="profileMenuItem">👤 Профиль</button>
     <button id="settingsMenuItem">⚙️ Настройки</button>
     <button id="favoritesMenuItem">⭐ Избранное</button>
-    <button id="commandsMenuItem">🎤 Голосовые команды</button>
     <button id="syncMenuItem">🔄 Синхронизация</button>
     <button id="logoutMenuItem">🚪 Выйти</button>
 </div>
@@ -271,7 +242,6 @@
     <div class="profile-stats">
         <div class="stat"><div class="stat-value" id="statRoutes">0</div><div class="stat-label">маршрутов</div></div>
         <div class="stat"><div class="stat-value" id="statFavorites">0</div><div class="stat-label">в избранном</div></div>
-        <div class="stat"><div class="stat-value" id="statCommands">0</div><div class="stat-label">команд</div></div>
     </div>
     <div class="achievements-title">🏆 Достижения</div>
     <div class="achievements-grid" id="achievementsGrid"></div>
@@ -305,26 +275,6 @@
         <button id="unlockSecretBtn">Разблокировать</button>
         <div id="secretStatus" style="font-size:0.7rem; text-align:center; margin-top:8px;"></div>
     </div>
-</div>
-
-<div id="commandsPanel" class="commands-panel">
-    <div class="commands-title">🎤 Свой голос и команды</div>
-    <div class="record-section">
-        <div class="record-title">📢 Записать или загрузить свой голос</div>
-        <div class="record-buttons">
-            <button id="startRecordBtn" class="record-btn">🔴 Записать</button>
-            <button id="uploadRecordBtn" class="record-btn upload">📁 Загрузить MP3</button>
-            <button id="playRecordBtn" class="record-btn play">▶ Прослушать</button>
-            <button id="deleteRecordBtn" class="record-btn delete">🗑 Удалить</button>
-        </div>
-        <input type="file" id="fileInput" class="file-input" accept="audio/*">
-        <div id="recordStatus" class="record-status">⚡ Запишите или загрузите свой голос</div>
-    </div>
-    <div class="commands-title">🎤 Список голосовых команд</div>
-    <div class="commands-list" id="commandsList"></div>
-    <div class="commands-progress" id="commandsProgress">0/0 выполнено</div>
-    <button id="startCommandsRecordBtn" class="commands-record-btn">🎙️ Начать распознавание</button>
-    <div id="commandsStatus" class="commands-status">⚡ Нажмите кнопку и произнесите команду</div>
 </div>
 
 <div id="favoritesPanel" class="favorite-panel">
@@ -386,21 +336,16 @@
             { id: 'first_route', name: 'Первый маршрут', icon: '🚀', desc: 'Построй свой первый маршрут', check: (stats) => stats.routes >= 1 },
             { id: 'traveler', name: 'Путешественник', icon: '🧭', desc: '5 построенных маршрутов', check: (stats) => stats.routes >= 5 },
             { id: 'explorer', name: 'Исследователь', icon: '🗺️', desc: '10 построенных маршрутов', check: (stats) => stats.routes >= 10 },
-            { id: 'master', name: 'Мастер навигации', icon: '🏆', desc: '25 построенных маршрутов', check: (stats) => stats.routes >= 25 },
             { id: 'collector', name: 'Коллекционер', icon: '⭐', desc: '5 мест в избранном', check: (stats) => stats.favorites >= 5 },
-            { id: 'expert', name: 'Эксперт', icon: '🎤', desc: '50% голосовых команд', check: (stats) => stats.commandsPercent >= 50 },
-            { id: 'guru', name: 'Гуру', icon: '🎙️', desc: '100% голосовых команд', check: (stats) => stats.commandsPercent >= 100 },
             { id: 'moderator', name: 'Лидер', icon: '🔐', desc: 'Активировать режим модератора', check: (stats) => stats.moderator === true }
         ];
         
         let currentUser = null;
         let currentPassword = null;
         
-        // Статистика для достижений
         let userStats = {
             routes: 0,
             favorites: 0,
-            commandsPercent: 0,
             moderator: false
         };
         
@@ -419,21 +364,14 @@
         function updateUserStats() {
             const routes = JSON.parse(localStorage.getItem('ncp_gps_history') || '[]').length;
             const favorites = JSON.parse(localStorage.getItem('ncp_favorites') || '[]').length;
-            const commands = JSON.parse(localStorage.getItem('ncp_voice_commands') || '[]').length;
-            const totalCommands = 28;
-            const commandsPercent = Math.round((commands / totalCommands) * 100);
             const moderator = localStorage.getItem('ncp_moderator') === 'true';
             
-            userStats = { routes, favorites, commandsPercent, moderator };
+            userStats = { routes, favorites, moderator };
             
-            // Обновляем отображение в профиле
             document.getElementById('statRoutes').innerText = routes;
             document.getElementById('statFavorites').innerText = favorites;
-            document.getElementById('statCommands').innerText = `${commandsPercent}%`;
             
-            // Сохраняем достижения в данные пользователя
             if (currentUser) saveCurrentUserData();
-            
             renderAchievements();
         }
         
@@ -460,11 +398,9 @@
             if (!currentUser || !currentPassword) return;
             const data = {
                 favorites: localStorage.getItem('ncp_favorites') || '[]',
-                voiceCommands: localStorage.getItem('ncp_voice_commands') || '[]',
                 theme: localStorage.getItem('ncp_theme') || 'dark',
                 moderator: localStorage.getItem('ncp_moderator') === 'true',
                 consent: localStorage.getItem('ncp_consent') === 'yes',
-                customVoice: localStorage.getItem('ncp_custom_voice') || null,
                 gpsHistory: localStorage.getItem('ncp_gps_history') || '[]',
                 createdAt: localStorage.getItem('ncp_created_at') || new Date().toISOString(),
                 stats: userStats
@@ -481,28 +417,22 @@
             if (users[nick] && users[nick].password === password && users[nick].data) {
                 const userData = users[nick].data;
                 if (userData.favorites) localStorage.setItem('ncp_favorites', userData.favorites);
-                if (userData.voiceCommands) localStorage.setItem('ncp_voice_commands', userData.voiceCommands);
                 if (userData.theme) { localStorage.setItem('ncp_theme', userData.theme); setTheme(userData.theme); }
                 if (userData.moderator) localStorage.setItem('ncp_moderator', 'true');
                 else localStorage.removeItem('ncp_moderator');
                 if (userData.consent) localStorage.setItem('ncp_consent', 'yes');
-                if (userData.customVoice) localStorage.setItem('ncp_custom_voice', userData.customVoice);
                 if (userData.gpsHistory) localStorage.setItem('ncp_gps_history', userData.gpsHistory);
                 if (userData.createdAt) localStorage.setItem('ncp_created_at', userData.createdAt);
                 if (userData.stats) userStats = userData.stats;
             } else {
                 localStorage.removeItem('ncp_favorites');
-                localStorage.removeItem('ncp_voice_commands');
                 localStorage.removeItem('ncp_moderator');
-                localStorage.removeItem('ncp_custom_voice');
                 localStorage.removeItem('ncp_gps_history');
                 if (!localStorage.getItem('ncp_created_at')) {
                     localStorage.setItem('ncp_created_at', new Date().toISOString());
                 }
             }
             loadFavorites();
-            loadCommandsProgress();
-            loadSavedRecording();
             setTheme(localStorage.getItem('ncp_theme') || 'dark');
             updateUserStats();
         }
@@ -516,14 +446,12 @@
             
             const emptyData = {
                 favorites: '[]',
-                voiceCommands: '[]',
                 theme: 'dark',
                 moderator: false,
                 consent: false,
-                customVoice: null,
                 gpsHistory: '[]',
                 createdAt: new Date().toISOString(),
-                stats: { routes: 0, favorites: 0, commandsPercent: 0, moderator: false }
+                stats: { routes: 0, favorites: 0, moderator: false }
             };
             
             users[nick] = { password: password, data: emptyData };
@@ -571,15 +499,11 @@
             localStorage.removeItem('ncp_current_user_simple');
             localStorage.removeItem('ncp_current_password_simple');
             localStorage.removeItem('ncp_favorites');
-            localStorage.removeItem('ncp_voice_commands');
             localStorage.removeItem('ncp_moderator');
-            localStorage.removeItem('ncp_custom_voice');
             localStorage.removeItem('ncp_gps_history');
             localStorage.setItem('ncp_theme', 'dark');
             setTheme('dark');
             loadFavorites();
-            loadCommandsProgress();
-            loadSavedRecording();
             document.getElementById('authOverlay').classList.remove('hidden');
         }
         
@@ -640,20 +564,6 @@
         });
         
         // ========== ОСТАЛЬНОЙ ФУНКЦИОНАЛ ==========
-        let recordedAudioUrl = null;
-        
-        function loadSavedRecording() {
-            const saved = localStorage.getItem('ncp_custom_voice');
-            if (saved) {
-                try {
-                    const blobData = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
-                    recordedAudioUrl = URL.createObjectURL(new Blob([blobData], { type: 'audio/webm' }));
-                    const statusDiv = document.getElementById('recordStatus');
-                    if (statusDiv) statusDiv.innerHTML = '✅ Ваш голос сохранён. Нажмите «Прослушать»';
-                } catch(e) {}
-            }
-        }
-        
         function setTheme(theme) {
             document.body.classList.remove('dark-theme', 'light-theme', 'blue-theme', 'green-theme', 'red-theme', 'purple-theme');
             document.body.classList.add(theme + '-theme');
@@ -666,46 +576,6 @@
         else setTheme('dark');
         
         document.querySelectorAll('.theme-btn').forEach(btn => { btn.onclick = () => setTheme(btn.dataset.theme); });
-        
-        function speakNCP(text) { console.log('Speak:', text); }
-        
-        const commandsList = [
-            "Маршрут принят", "Поверните налево", "Поверните направо", "Двигайтесь прямо",
-            "Вы прибыли", "Маршрут отменён", "Ваше местоположение определено",
-            "Через 100 метров поверните налево", "Через 100 метров поверните направо",
-            "Через 200 метров поверните налево", "Через 200 метров поверните направо",
-            "Через 300 метров поверните налево", "Через 300 метров поверните направо",
-            "На следующем перекрёстке поверните налево", "На следующем перекрёстке поверните направо",
-            "Сверните на развязке налево", "Сверните на развязке направо",
-            "Приготовьтесь к повороту налево", "Приготовьтесь к повороту направо",
-            "Оставайтесь на полосе", "Следуйте по маршруту", "Выезжайте на трассу",
-            "Продолжайте движение", "Учтите пробки", "Перестроение через 500 метров",
-            "Снизьте скорость", "Камера впереди", "Приготовьтесь, скоро поворот"
-        ];
-        
-        let completedCommands = [];
-        function loadCommandsProgress() {
-            const saved = localStorage.getItem('ncp_voice_commands');
-            if (saved) { try { completedCommands = JSON.parse(saved); } catch(e) {} }
-            renderCommandsList();
-            updateUserStats();
-        }
-        function renderCommandsList() {
-            const container = document.getElementById('commandsList');
-            if (!container) return;
-            container.innerHTML = '';
-            commandsList.forEach(cmd => {
-                const isCompleted = completedCommands.includes(cmd);
-                const item = document.createElement('div');
-                item.className = 'command-item';
-                if (isCompleted) item.classList.add('completed');
-                item.innerHTML = `<span class="command-text">${cmd}</span><span class="command-check">${isCompleted ? '✅' : '⬜'}</span>`;
-                container.appendChild(item);
-            });
-            const progress = document.getElementById('commandsProgress');
-            if (progress) progress.innerText = `${completedCommands.length}/${commandsList.length} выполнено`;
-        }
-        loadCommandsProgress();
         
         let favorites = [], isSelectingFavorite = false;
         const selectBtn = document.getElementById('selectFavoriteBtn');
@@ -726,7 +596,7 @@
         }
         function removeFromFavorites(id) { favorites = favorites.filter(f => f.id !== id); saveFavorites(); updateUserStats(); }
         function saveFavorites() { localStorage.setItem('ncp_favorites', JSON.stringify(favorites)); renderFavorites(); if (currentUser) saveCurrentUserData(); updateUserStats(); }
-        function routeToFavorite(lat, lng, name) { if (currentLat !== null) { buildRouteTo(currentLat, currentLng, lat, lng); speakNCP(`Маршрут до ${name} построен`); } else { alert('Сначала дождитесь определения GPS'); } }
+        function routeToFavorite(lat, lng, name) { if (currentLat !== null) { buildRouteTo(currentLat, currentLng, lat, lng); } else { alert('Сначала дождитесь определения GPS'); } }
         function startSelectingFavorite() { isSelectingFavorite = true; selectBtn.classList.add('active'); selectBtn.innerHTML = '<span>📍</span> Нажмите на карту...'; map.getCanvas().style.cursor = 'crosshair'; }
         function stopSelectingFavorite() { isSelectingFavorite = false; selectBtn.classList.remove('active'); selectBtn.innerHTML = '<span>⭐</span> Добавить в избранное'; map.getCanvas().style.cursor = ''; }
         if (selectBtn) selectBtn.addEventListener('click', () => { if (isSelectingFavorite) stopSelectingFavorite(); else startSelectingFavorite(); });
@@ -787,11 +657,9 @@
                 version: "1.0",
                 timestamp: new Date().toISOString(),
                 favorites: JSON.parse(localStorage.getItem('ncp_favorites') || '[]'),
-                voiceCommands: JSON.parse(localStorage.getItem('ncp_voice_commands') || '[]'),
                 theme: localStorage.getItem('ncp_theme') || 'dark',
                 moderator: localStorage.getItem('ncp_moderator') === 'true',
                 consent: localStorage.getItem('ncp_consent') === 'yes',
-                customVoice: localStorage.getItem('ncp_custom_voice') || null,
                 gpsHistory: JSON.parse(localStorage.getItem('ncp_gps_history') || '[]')
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -814,16 +682,13 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if (data.favorites) localStorage.setItem('ncp_favorites', JSON.stringify(data.favorites));
-                    if (data.voiceCommands) localStorage.setItem('ncp_voice_commands', JSON.stringify(data.voiceCommands));
                     if (data.theme) { localStorage.setItem('ncp_theme', data.theme); setTheme(data.theme); }
                     if (data.moderator) localStorage.setItem('ncp_moderator', 'true');
                     else localStorage.removeItem('ncp_moderator');
                     if (data.consent) localStorage.setItem('ncp_consent', 'yes');
-                    if (data.customVoice) localStorage.setItem('ncp_custom_voice', data.customVoice);
                     if (data.gpsHistory) localStorage.setItem('ncp_gps_history', JSON.stringify(data.gpsHistory));
                     if (currentUser) saveCurrentUserData();
                     loadFavorites();
-                    loadCommandsProgress();
                     updateUserStats();
                     const statusDiv = document.getElementById('syncStatus');
                     if (statusDiv) statusDiv.innerHTML = '✅ Данные импортированы!';
@@ -838,24 +703,22 @@
         document.getElementById('importDataBtn')?.addEventListener('click', () => document.getElementById('importFileInput').click());
         document.getElementById('importFileInput')?.addEventListener('change', (e) => { if (e.target.files[0]) importAllData(e.target.files[0]); e.target.value = ''; });
         
-        // ========== НАВИГАЦИЯ UI ==========
+        // ========== НАВИГАЦИЯ ==========
         var userMarker = new maplibregl.Marker({ color: '#3b82f6' }).setLngLat([37.618423, 55.751244]).addTo(map);
         var destMarkers = [], routeSources = [], currentLat = null, currentLng = null, routeHistory = [], continueBtn = null, lastTap = 0;
         
         function updateRoutesStat() {
-            const routes = routeHistory.length;
             updateUserStats();
             if (currentUser) saveCurrentUserData();
         }
         
         try { var stored = localStorage.getItem('ncp_gps_history'); if (stored) routeHistory = JSON.parse(stored); document.getElementById('archiveCount').innerText = routeHistory.length; updateUserStats(); } catch(e) {}
         
-        var menuPanel = document.getElementById('menuPanel'), settingsPanel = document.getElementById('settingsPanel'), favoritesPanel = document.getElementById('favoritesPanel'), commandsPanel = document.getElementById('commandsPanel'), syncPanel = document.getElementById('syncPanel'), profilePanel = document.getElementById('profilePanel'), menuBtn = document.getElementById('menuBtn');
+        var menuPanel = document.getElementById('menuPanel'), settingsPanel = document.getElementById('settingsPanel'), favoritesPanel = document.getElementById('favoritesPanel'), syncPanel = document.getElementById('syncPanel'), profilePanel = document.getElementById('profilePanel'), menuBtn = document.getElementById('menuBtn');
         function closeAllPanels() { 
             if (menuPanel) menuPanel.classList.remove('active'); 
             if (settingsPanel) settingsPanel.classList.remove('active'); 
             if (favoritesPanel) favoritesPanel.classList.remove('active'); 
-            if (commandsPanel) commandsPanel.classList.remove('active'); 
             if (syncPanel) syncPanel.classList.remove('active'); 
             if (profilePanel) profilePanel.classList.remove('active'); 
         }
@@ -863,11 +726,9 @@
         document.getElementById('profileMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); updateUserStats(); if (profilePanel) profilePanel.classList.add('active'); });
         document.getElementById('settingsMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); if (settingsPanel) settingsPanel.classList.add('active'); });
         document.getElementById('favoritesMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); renderFavorites(); if (favoritesPanel) favoritesPanel.classList.add('active'); });
-        document.getElementById('commandsMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); renderCommandsList(); if (commandsPanel) commandsPanel.classList.add('active'); });
         document.getElementById('syncMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); closeAllPanels(); if (syncPanel) syncPanel.classList.add('active'); });
-        document.getElementById('promoMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); alert('🧭 NCPGPS — навигатор принятых решений\n\n🏆 Достижения открываются за активность\n🔐 Режим модератора — пароль 6369'); closeAllPanels(); });
-        document.addEventListener('click', function(e) { if (menuPanel && !menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active'); if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) settingsPanel.classList.remove('active'); if (favoritesPanel && !favoritesPanel.contains(e.target) && e.target !== document.getElementById('favoritesMenuItem')) favoritesPanel.classList.remove('active'); if (commandsPanel && !commandsPanel.contains(e.target) && e.target !== document.getElementById('commandsMenuItem')) commandsPanel.classList.remove('active'); if (syncPanel && !syncPanel.contains(e.target) && e.target !== document.getElementById('syncMenuItem')) syncPanel.classList.remove('active'); if (profilePanel && !profilePanel.contains(e.target) && e.target !== document.getElementById('profileMenuItem')) profilePanel.classList.remove('active'); });
-        if (!localStorage.getItem('ncp_consent')) { if (confirm('🔐 Ваши данные хранятся только на этом устройстве. Продолжить?')) localStorage.setItem('ncp_consent', 'yes'); }
+        document.getElementById('promoMenuItem')?.addEventListener('click', function(e) { e.stopPropagation(); alert('🧭 NCPGPS — навигатор принятых решений'); closeAllPanels(); });
+        document.addEventListener('click', function(e) { if (menuPanel && !menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('active'); if (settingsPanel && !settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsMenuItem')) settingsPanel.classList.remove('active'); if (favoritesPanel && !favoritesPanel.contains(e.target) && e.target !== document.getElementById('favoritesMenuItem')) favoritesPanel.classList.remove('active'); if (syncPanel && !syncPanel.contains(e.target) && e.target !== document.getElementById('syncMenuItem')) syncPanel.classList.remove('active'); if (profilePanel && !profilePanel.contains(e.target) && e.target !== document.getElementById('profileMenuItem')) profilePanel.classList.remove('active'); });
         
         function startGPS() {
             var statusDiv = document.getElementById('coordStatus');
@@ -917,7 +778,6 @@
         document.getElementById('buildRouteCompact').onclick = buildFromInput;
         document.getElementById('cancelRouteBtn').onclick = cancelRoute;
         document.getElementById('centerBtn').onclick = () => { if (currentLat) map.flyTo({ center: [currentLng, currentLat], zoom: 14, duration: 500 }); };
-        document.getElementById('voiceTrigger').onclick = () => {}
         document.getElementById('archiveCompact').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         document.getElementById('archiveCompact2').onclick = () => alert(routeHistory.length ? 'Архив: ' + routeHistory.length + ' маршрутов' : 'Архив пуст');
         
